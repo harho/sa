@@ -78,7 +78,7 @@ var UiUtils = (function () {
                 formControlDiv.className='form-group has-error';
                     
                 formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
-                formControlDiv.childNodes[1].setAttribute('data-placement", 'top');
+                formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
                 formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
                 
             }
