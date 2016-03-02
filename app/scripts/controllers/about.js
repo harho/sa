@@ -8,6 +8,39 @@
  * Controller of the test1App
  */
 angular.module('test1App')
+    
+    .directive('toBig', function(){
+        return{
+            restrict: 'A',
+            require: 'ngModel',
+            link: function(scope, element, attr, ngModel){
+
+                ngModel.$formatters.push(function(value){
+                    console.log("formatter");
+                    //from modtel to UI
+                    //when code change model
+                    if(value){
+                        return new Big(value);
+                    }
+                    //return value.toUpperCase();
+
+                });
+
+                ngModel.$parsers.push(function(value){
+                   //form UI to model
+                    console.log("Parser");
+                    //return value.toUpperCase();
+                    //value for model
+                    if(value){
+                      return new Big(value);  
+                    }
+                    return null;             
+              });
+
+            }
+        };
+    })
+
 
   .directive('sgBind', function () {
     return {
@@ -67,17 +100,13 @@ angular.module('test1App')
     
     $scope.validationErrors = ValidationErrors.getErrors();
     
-    /*function doCalculation(obj) {
-        obj.total = obj.value1 + obj.value2; 
-        obj.totalNumber = obj.number1.plus(obj.number2); 
-        
-    }*/
+    
     
     var user = {
         
         
         //sa$value1 : { notEmptyValidation: {},  calculation: {}  }, 
-        value1 : null,
+        value1 : 1,
          
         //sa$value2 : [ {notEmpty: {}}, { calculation: {} } ], 
         //sa$value2 : { notEmptyValidation: {},  calculation: {}  }, 
@@ -93,11 +122,7 @@ angular.module('test1App')
         name : 'Pablo', 
         
         geek: true,
-         
-        //sa$number1: { notEmptyValidation: {}, calculation: {}  },
-        number1: new Big(0.1),
-        //sa$number2: { notEmptyValidation: {}, calculation: {}  },
-        number2: new Big(0.2),
+        
          
         //sa$address: { beanValidation: {} },
         address: {
@@ -109,8 +134,9 @@ angular.module('test1App')
             
             //sa$note: { beanValidation: {} },
             note: {
-                sa$value : { notEmptyValidation: {} },
                 value: null,
+                number1: 0.00001,
+                number2: 0.00002,
             },
             
         },
@@ -138,9 +164,7 @@ angular.module('test1App')
         sa$value2 : { notEmptyValidation: {},  calculation: {}  }, 
         sa$email : { notEmptyValidation: {}, emailValidation: {} }, 
         
-        sa$name : { notEmptyValidation: {} } ,  
-        sa$number1: { notEmptyValidation: {}, calculation: {}  },
-        sa$number2: { notEmptyValidation: {}, calculation: {}  },
+        sa$name : { notEmptyValidation: {} } , 
         
         sa$address: { beanValidation: {} },
         address: {
@@ -151,6 +175,8 @@ angular.module('test1App')
             sa$note: { beanValidation: {} },
             note: {
                 sa$value : { notEmptyValidation: {} },
+                sa$number1: { notEmptyValidation: {}, calculation: {}, bigConversion : {}  },
+                sa$number2: { notEmptyValidation: {}, calculation: {}, bigConversion : {}  },
             },
         },
      };
@@ -162,6 +188,17 @@ angular.module('test1App')
     
     $scope.user = user;
     $scope.errors = errors;
+    
+    var userClone = ReflectionUtils.cloneObject(user);
+    
+    var converter = ShadowAnnotationRegister.getConverter('bigConversion');
+    
+    if(converter) {
+        converter.from(null, "address.note.number1", userClone);
+    }
+    
+    $scope.userClone = userClone;
+    
     
     
     //doUpdateUi();

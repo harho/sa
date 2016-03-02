@@ -26,6 +26,20 @@
             </div>
             
             <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">Number1</label>                       
+                <div class="col-sm-10">
+                    <input type="text"  ng-model="user.address.note.sg_number1" sg-bind to-big  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">Number2</label>                       
+                <div class="col-sm-10">
+                    <input type="text"  ng-model="user.address.note.sg_number2" sg-bind to-big ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number2">
+                </div>
+            </div>
+            
+            <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Geek</label>                       
                 <div class="col-sm-10">
                         
@@ -60,14 +74,14 @@
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Value1</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
+                    <input type="number" sg-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Value2</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="number" sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
             
@@ -93,6 +107,7 @@
 </div>
 
 <div>User: <b>{{user|json}}</b></div>
+<div>User clone: <b>{{userClone|json}}</b></div>
 
 <script>
         $(document).ready(function(){
