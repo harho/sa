@@ -2,15 +2,18 @@
     <p>This is the simle test/demo application for very fast reative validation and proccesing approach.</p>
 
 
-    <div><span id="all-errors" class="badge alert-danger" data-toggle="popover" data-trigger="hover" data-html="true">{{validationErrors.length}}</span> <b>Form</b></div>
+    <div></div>
+    
+    <div>
+        <span id="all-errors" class="badge alert-danger" data-toggle="popover" data-trigger="hover" data-html="true">{{validationErrors.length}}</span> <b>Form</b>
+        
+        <button class="btn btn-primary btn-sm" ng-click="enableEdit()">Edit</button>
+        <button class="btn btn-primary btn-sm" ng-click="convertFrom()">Convert from</button>
+    </div>
     
     <!--<div>Errors: <b>{{errors|json}}</b></div>-->
     <div>Validation Errors: <b>{{validationErrors|json}}</b></div>
 
-
-    <div>Name: <b>{{user.name}}</b></div>
-    <div>Value1: <b>{{user.value1}}</b></div>
-    <div>Value2: <b>{{user.value2}}</b></div>
     <div>Total: <b>{{user.total}}</b></div>
     <div>Total number: <b>{{user.totalNumber.toString()}}</b></div>
 </div>
@@ -21,21 +24,21 @@
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Name</label>                       
                 <div class="col-sm-10">
-                    <input type="text"  ng-model="user.sg_name" sg-bind  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Name">
+                    <input type="text" readonly ng-model="user.sg_name" sg-bind  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Name">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Number1</label>                       
                 <div class="col-sm-10">
-                    <input type="text"  ng-model="user.address.note.sg_number1" sg-bind to-big  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number1">
+                    <input type="text" readonly ng-model="user.address.note.sg_number1" sg-bind to-big  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number1">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Number2</label>                       
                 <div class="col-sm-10">
-                    <input type="text"  ng-model="user.address.note.sg_number2" sg-bind to-big ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number2">
+                    <input type="text" readonly ng-model="user.address.note.sg_number2" sg-bind to-big ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number2">
                 </div>
             </div>
             
@@ -43,7 +46,7 @@
                 <label for="name" class="col-sm-2 control-label">Geek</label>                       
                 <div class="col-sm-10">
                         
-                    <input type="checkbox"  ng-model="user.sg_geek" sg-bind  ng-model-options="{ getterSetter: true }" id="name" name="name" placeholder="Enter Name">
+                    <input type="checkbox" disabled ng-model="user.sg_geek" sg-bind  ng-model-options="{ getterSetter: true }" id="name" name="name" placeholder="Enter Name">
                     
                 </div>
             </div>
@@ -51,14 +54,14 @@
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Email</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.sg_email" ng-model-options="{ getterSetter: true }" class="form-control" id="email" name="email" placeholder="Enter Email">
+                    <input type="text" readonly sg-bind ng-model="user.sg_email" ng-model-options="{ getterSetter: true }" class="form-control" id="email" name="email" placeholder="Enter Email">
                 </div>
             </div>
             
              <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">Street</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.address.sg_street" ng-model-options="{ getterSetter: true }" class="form-control" id="street" name="street" placeholder="Enter Street">
+                    <input type="text" readonly sg-bind ng-model="user.address.sg_street" ng-model-options="{ getterSetter: true }" class="form-control" id="street" name="street" placeholder="Enter Street">
                 </div>
             </div>
             
@@ -66,7 +69,7 @@
             <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">City</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.address.sg_city" ng-model-options="{ getterSetter: true }" class="form-control" id="city" name="city" placeholder="Enter City">
+                    <input type="text" readonly sg-bind ng-model="user.address.sg_city" ng-model-options="{ getterSetter: true }" class="form-control" id="city" name="city" placeholder="Enter City">
                 </div>
             </div>
             
@@ -74,21 +77,21 @@
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Value1</label>                       
                 <div class="col-sm-10">
-                    <input type="number" sg-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
+                    <input type="number" readonly sg-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Value2</label>                       
                 <div class="col-sm-10">
-                    <input type="number" sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="number" readonly sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="noteValue" class="col-sm-2 control-label">Note value</label>                       
                 <div class="col-sm-10">
-                    <input type="text" sg-bind ng-model="user.address.note.sg_value" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="text" readonly sg-bind ng-model="user.address.note.sg_value" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
             
@@ -107,7 +110,7 @@
 </div>
 
 <div>User: <b>{{user|json}}</b></div>
-<div>User clone: <b>{{userClone|json}}</b></div>
+<div>User clone: <b>{{data.userClone|json}}</b></div>
 
 <script>
         $(document).ready(function(){
@@ -119,7 +122,7 @@
 })
     </script>
 
-    {{fireValidation()}}
+    <!--{{fireValidation()}}-->
 
 <br/>
 <br/>

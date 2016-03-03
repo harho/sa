@@ -9,8 +9,8 @@ var ShadowAnnotationConstants = (function () {
     'use strict';
 
     return {
-        prefix : "sa$",
-        key : "sa$sa",
+        prefix : 'sa$',
+        key : 'sa$sa',
     };
 }());
 
@@ -18,6 +18,7 @@ var DataBindingContext = (function () {
     'use strict';
 
     var bindings = {};
+    var enabled = false;
 
     var addBinding = function (property, element) {
         bindings[property] = element;
@@ -30,6 +31,15 @@ var DataBindingContext = (function () {
         },
         getBindings : function () {  
             return bindings;
+        },
+        isEnabled : function () {  
+            return enabled;
+        },
+        enable : function () {  
+            return enabled = true;
+        },
+        disable : function () {  
+            return enabled = true;
         },
         
     };
@@ -48,8 +58,8 @@ var UiUtils = (function () {
         if(validationErrors.length>0) {
             var errorsContent = '';
             var errorsPerPath = {};
-            console.log(errorsPerPath);
-            console.log('validationErrors.length: '+validationErrors.length);
+            //console.log(errorsPerPath);
+            //console.log('validationErrors.length: '+validationErrors.length);
             
             for (var i = 0; i < validationErrors.length; i++) {
                 
@@ -75,11 +85,11 @@ var UiUtils = (function () {
                 formControlDiv.childNodes[1].removeAttribute('data-toggle');
             }
             
-            console.log(errorsPerPath);
+            //console.log(errorsPerPath);
             
             for (var i in errorsPerPath ) {
                 
-                console.log(errorsPerPath[i].property);
+                //console.log(errorsPerPath[i].property);
                 
                 var formControlDiv = bindings['user.'+errorsPerPath[i].property].parentNode.parentNode;
                 formControlDiv.className='form-group has-error';
@@ -124,31 +134,17 @@ var UiUtils = (function () {
 var ReflectionUtils = (function () {
     'use strict';
     
-    function cloneObject(obj) {
-      if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
-        return obj;
-
-      if (obj instanceof Date)
-        var temp = new obj.constructor(); //or new Date(obj);
-      else
-        var temp = obj.constructor();
-
-      for (var key in obj) {
-        if (Object.prototype.hasOwnProperty.call(obj, key)) {
-          obj['isActiveClone'] = null;
-          temp[key] = cloneObject(obj[key]);
-          delete obj['isActiveClone'];
-        }
-      }
-
-      return temp;
-    }
     
     function processAnnotations(obj, property) {
-        console.log('Proccessing annotations for property '+property);
+        
+        if(!DataBindingContext.isEnabled) {
+            return;
+        }
+        
+        //console.log('Proccessing annotations for property '+property);
         
         var shadowAnnotations = getShadowAnnotations(obj, property);
-        console.log(shadowAnnotations);
+        //console.log(shadowAnnotations);
         if(shadowAnnotations) {
             
             for ( var j in shadowAnnotations ) {
@@ -187,7 +183,7 @@ var ReflectionUtils = (function () {
     
     function addSettersGetters(obj, rootObj, name, path) {
         
-        console.log('Adding setter getter for '+name+' on path '+path);
+        ///console.log('Adding setter getter for '+name+' on path '+path);
         var rootShadowObj = ShadowAnnotationRegister.getShadowObject(rootObj);
         var shadowObj = getBeforeLast(rootShadowObj, path ? path+"."+name: name);
         var propertyValue = ReflectionUtils.getPropertyValue(obj, path ? path+"."+name: name);
@@ -201,9 +197,9 @@ var ReflectionUtils = (function () {
             
             if(shadowAnnotations) {
                 
-                console.log(shadowAnnotations);
+                //console.log(shadowAnnotations);
                 var conversionAnnotation =  shadowAnnotations[i];   
-                console.log(conversionAnnotation);
+                //console.log(conversionAnnotation);
                 if(conversionAnnotation) {
                     var converter = ShadowAnnotationRegister.getConverter(i);
                     converter.to(conversionAnnotation, path ? path+'.'+name: name, rootObj);
@@ -225,7 +221,7 @@ var ReflectionUtils = (function () {
             
             if(arguments.length) {
                 //console.log('set '+name+' call '+newValue);
-                console.log(shadowObj);
+                //console.log(shadowObj);
                 if(oldValue!==newValue) {
                     //console.log('fire value change event if needed '+oldValue+' !== '+newValue);
                     
@@ -259,7 +255,7 @@ var ReflectionUtils = (function () {
                     if( !(i.indexOf('sa$') > -1)) {
                         //console.log("Create setter getter for "+i);
                         
-                        if(  (!!obj[i]) && (obj[i].constructor === Object)) {
+                        if(isObject(obj[i])) {
                             createSettersGetters(rootObj, path ? path+"."+i: i);
                         }
                         
@@ -270,6 +266,63 @@ var ReflectionUtils = (function () {
             }
     }
     
+    function doConversionFrom(obj, rootObj, name, path) {
+        
+        //console.log('--> Converting > from > property '+name+' on path '+path);
+        var rootShadowObj = ShadowAnnotationRegister.getShadowObject(rootObj);
+        var shadowObj = getBeforeLast(rootShadowObj, path ? path+"."+name: name);
+        var propertyValue = ReflectionUtils.getPropertyValue(obj, path ? path+"."+name: name);
+        
+        // processing converters 
+        var converters = ShadowAnnotationRegister.getAllConverters();
+        var shadowAnnotations = shadowObj[ShadowAnnotationConstants.prefix+name];
+        
+        for ( var i in converters ) {
+            
+            if(shadowAnnotations) {
+                
+                //console.log(shadowAnnotations);
+                var conversionAnnotation =  shadowAnnotations[i];   
+                //console.log(conversionAnnotation);
+                if(conversionAnnotation) {
+                    var converter = ShadowAnnotationRegister.getConverter(i);
+                    converter.from(conversionAnnotation, path ? path+'.'+name: name, rootObj);
+                }
+            }
+        }
+        
+    }
+    
+    
+    function convertFrom(obj, path) {
+        //console.log('----> Converting from call --->>>');
+        var rootObj = obj;
+        var obj = path ? ReflectionUtils.getPropertyValue(obj, path): obj;
+            
+        for ( var i in obj ) {
+           if (obj.hasOwnProperty(i)) {
+                    
+               if( !(i.indexOf('sa$') > -1) && !(i.indexOf('sg_') > -1)) {
+                    //console.log('----> Converting property: '+i);
+                        
+                    if(isObject(obj[i])) {
+                        convertFrom(rootObj, path ? path+'.'+i: i);
+                    }
+                        
+                    doConversionFrom(obj, rootObj, i, path);
+                }
+                
+            }
+        }
+        return obj;
+        
+    }
+    
+    
+    function isObject(obj) {
+      return (!!obj) && (obj.constructor === Object);  
+    }
+    
     
     function getShadowAnnotations(obj, property) {
         //console.log("------------------------------------");
@@ -277,9 +330,9 @@ var ReflectionUtils = (function () {
         var shadowObj = ShadowAnnotationRegister.getShadowObject(obj);
         var obj2 = getBeforeLast(shadowObj, property);
         var propertyName = property.substr(property.lastIndexOf(".")+1, property.length);
-        console.log(obj2["sa$"+propertyName]);
+        //console.log(obj2['sa$'+propertyName]);
         //console.log("/-----------------------------------");
-        return obj2["sa$"+propertyName];
+        return obj2['sa$'+propertyName];
         
         
     }
@@ -289,13 +342,13 @@ var ReflectionUtils = (function () {
         
         if(obj) {
         
-            if(!!~property.indexOf(".")) {
+            if(!!~property.indexOf('.')) {
                 
                 
-                var part1 = property.substr(0,property.indexOf("."));
-                var part2 = property.substr(property.indexOf(".")+1, property.length);
+                var part1 = property.substr(0,property.indexOf('.'));
+                var part2 = property.substr(property.indexOf('.')+1, property.length);
                 
-                if(!(!!~part2.indexOf("."))) {
+                if(!(!!~part2.indexOf('.'))) {
                     return obj[part1];
                 }
                 
@@ -313,9 +366,9 @@ var ReflectionUtils = (function () {
         
         if(obj && property) {
         
-            if(!!~property.indexOf(".")) {
-                var part1 = property.substr(0,property.indexOf("."));
-                var part2 = property.substr(property.indexOf(".")+1, property.length);
+            if(!!~property.indexOf('.')) {
+                var part1 = property.substr(0,property.indexOf('.'));
+                var part2 = property.substr(property.indexOf('.')+1, property.length);
                 
                 return getPropertyValue(obj[part1], part2);
 
@@ -343,6 +396,9 @@ var ReflectionUtils = (function () {
         cloneObject: function(obj) {        
             return JSON.parse(JSON.stringify(obj));
         },
+        convertFrom: function(obj) {
+            return convertFrom(obj);
+        }
     };
     
 }());
@@ -375,6 +431,9 @@ var ValidationErrors = (function () {
         getErrors: function() {
             return errors;
         },
+        removeAllErrors: function() {
+            errors.length = 0;
+        },
         
     };
 }());
@@ -388,27 +447,27 @@ var ShadowAnnotationRegister = (function () {
     var shadowObjects = {};
     
     var addProcessor = function (annotationName, processor) {  
-        console.log("Adding processor for annotation "+annotationName);
+        //console.log("Adding processor for annotation "+annotationName);
         processors[annotationName] = processor;
     };
     
     
     var addConverter = function (annotationName, converter) {
         
-        console.log("Adding converter for annotation "+annotationName);
+        //console.log("Adding converter for annotation "+annotationName);
         converters[annotationName] = converter;
         
     };
     
     var addValidator = function (annotationName, validator) {
         
-        console.log("Adding validation for annotation "+annotationName);
+        //console.log("Adding validation for annotation "+annotationName);
         validators[annotationName] = validator;
         
     };
     var addShadowObject = function (shadowObjectKey, shadowObject) {
         
-        console.log("Adding shadow object  "+shadowObjectKey);
+        //console.log("Adding shadow object  "+shadowObjectKey);
         shadowObjects[shadowObjectKey] = shadowObject;
         
     };
@@ -461,7 +520,7 @@ var NotEmptyValidator = (function () {
         
         var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
         //console.log(obj);
-        console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+        //console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
         
         
         
@@ -494,7 +553,7 @@ var EmailValidator = (function () {
 
     var doValidation = function (sa, property, obj, profile)  {
         
-        console.log('Running validation for annotation '+annotationName);
+        //console.log('Running validation for annotation '+annotationName);
         
         var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
         
@@ -536,7 +595,7 @@ var BeanValidator = (function () {
         
         var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
         
-        console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+       // console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
         
         
         
@@ -603,36 +662,35 @@ ShadowAnnotationRegister.addValidator('beanValidation', BeanValidator);
 var BigConverter = (function () {
     'use strict';
 
-    var annotationName = "bigConversion";
+    var annotationName = 'bigConversion';
 
     var to = function (sa, property, obj) {
         
         var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-        console.log('Running conversion > to > for annotation '+annotationName+' for '+property+':'+propertyValue);
+        //console.log('Running conversion > to > for annotation '+annotationName+' for '+property+': '+propertyValue);
         
         if(propertyValue) {
             
             var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
-            console.log(ownerObj);
-            var propertyName = property.substr(property.lastIndexOf(".")+1, property.length);
             
+            //console.log(ownerObj);
+            var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
             ownerObj[propertyName] = new Big(propertyValue);
-            
-            
         }
     };
     
     var from = function (sa, property, obj) {
         
         var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-        console.log('Running conversion > from > for annotation '+annotationName+' for '+property+':'+propertyValue);
+        //console.log('Running conversion > from > for annotation '+annotationName+' for '+property+': '+propertyValue);
         
         if(propertyValue) {    
             var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
         
-            var propertyName = property.substr(property.lastIndexOf(".")+1, property.length);
+            var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
             
             ownerObj[propertyName] = parseFloat(propertyValue);
+            //console.log(ownerObj[propertyName]);
         }
     };  
 
@@ -654,15 +712,20 @@ ShadowAnnotationRegister.addConverter('bigConversion', BigConverter);
 
 var Calculation = (function () {
     'use strict';
-    var annotationName = "calculation";
+    var annotationName = 'calculation';
+    
+    
+    var isBig = function (obj) {
+        return (!!obj) && (obj.constructor === Big)
+    }
     
     var process = function (sa, property, obj, profile) {
         
-        console.log('Calculation call ----> ---->'+(typeof obj.address.note.number2));
-        console.log(obj);
+        //console.log('Calculation call.');
+        //console.log(obj);
         obj.total = obj.value1 + obj.value2; 
 
-        if(obj.address.note.number1 && obj.address.note.number2 && typeof obj.address.note.number2 ==='object') {
+        if(obj.address.note.number1 && obj.address.note.number2 && isBig(obj.address.note.number2)) {
                 obj.totalNumber = obj.address.note.number1.plus(obj.address.note.number2); 
         }
         

@@ -16,7 +16,7 @@ angular.module('test1App')
             link: function(scope, element, attr, ngModel){
 
                 ngModel.$formatters.push(function(value){
-                    console.log("formatter");
+                    //console.log('formatter');
                     //from modtel to UI
                     //when code change model
                     if(value){
@@ -28,7 +28,7 @@ angular.module('test1App')
 
                 ngModel.$parsers.push(function(value){
                    //form UI to model
-                    console.log("Parser");
+                    //console.log('Parser');
                     //return value.toUpperCase();
                     //value for model
                     if(value){
@@ -92,13 +92,14 @@ angular.module('test1App')
 
   .controller('AboutCtrl', function ($scope) {
     
-    var errors = [];
-    
-    var bindedElements = {};
-    
-    $scope.bindedElements = bindedElements;
     
     $scope.validationErrors = ValidationErrors.getErrors();
+    
+    var data = {
+        
+    }
+    $scope.data = data;
+    
     
     
     
@@ -106,14 +107,15 @@ angular.module('test1App')
         
         
         //sa$value1 : { notEmptyValidation: {},  calculation: {}  }, 
-        value1 : 1,
+        value1 : 9007199254740994,
          
         //sa$value2 : [ {notEmpty: {}}, { calculation: {} } ], 
         //sa$value2 : { notEmptyValidation: {},  calculation: {}  }, 
-        value2 : 2,
+        value2 : 0.9999,
          
         //sa$email : { notEmptyValidation: {}, emailValidation: {} }, 
         email: null,
+        
         
         total: 0,
         totalNumber: 0,
@@ -135,8 +137,8 @@ angular.module('test1App')
             //sa$note: { beanValidation: {} },
             note: {
                 value: null,
-                number1: 0.00001,
-                number2: 0.00002,
+                number1: 9007199254740994,
+                number2: 0.9999,
             },
             
         },
@@ -156,13 +158,14 @@ angular.module('test1App')
      };
     
     //this is very important
-    user[ShadowAnnotationConstants.key] = "shadow.object.key.user";
+    user[ShadowAnnotationConstants.key] = 'shadow.object.key.user';
     
     var userShadow = {
         
         sa$value1 : { notEmptyValidation: {},  calculation: {}  }, 
         sa$value2 : { notEmptyValidation: {},  calculation: {}  }, 
         sa$email : { notEmptyValidation: {}, emailValidation: {} }, 
+        sa$totalNumber: { bigConversion : {}  },
         
         sa$name : { notEmptyValidation: {} } , 
         
@@ -187,17 +190,12 @@ angular.module('test1App')
     ReflectionUtils.createSettersGetters(user);
     
     $scope.user = user;
-    $scope.errors = errors;
     
     var userClone = ReflectionUtils.cloneObject(user);
     
-    var converter = ShadowAnnotationRegister.getConverter('bigConversion');
+    ReflectionUtils.convertFrom(userClone);
     
-    if(converter) {
-        converter.from(null, "address.note.number1", userClone);
-    }
-    
-    $scope.userClone = userClone;
+    $scope.data.userClone = userClone;
     
     
     
@@ -214,6 +212,70 @@ angular.module('test1App')
             UiUtils.updateUi();
             fireValidationCalled = true;
         }
+    }
+    
+    $scope.enableEdit = enableEdit;
+    
+    var editMode = false;
+    
+    function enableEdit() {
+        var bindings = DataBindingContext.getBindings();
+        
+        for(var i in bindings) {
+            
+            if(!editMode) {
+            
+                
+                
+                if(bindings[i].getAttribute('type')=='checkbox') {
+                    bindings[i].removeAttribute('disabled');    
+                }
+                else {
+                    bindings[i].removeAttribute('readonly');
+                }
+                
+            }
+            else {
+                console.log(bindings[i].getAttribute('type'));
+                if(bindings[i].getAttribute('type')=='checkbox') {
+                    bindings[i].setAttribute('disabled',true);    
+                }
+                else {
+                    bindings[i].setAttribute('readonly',true);
+                }
+                
+                
+            }
+            
+        }
+        
+        if(!editMode) {
+            
+            DataBindingContext.enable();
+            BeanValidator.doValidation(null, null, user);    
+            UiUtils.updateUi();
+            fireValidationCalled = true;
+        }
+        else {
+            DataBindingContext.disable();
+            ValidationErrors.removeAllErrors();
+            UiUtils.updateUi();
+        }
+        
+        
+        editMode = !editMode;
+    }
+    
+    $scope.convertFrom = convertFrom;
+    
+    function convertFrom() {
+        
+         console.log("Converting from call");
+         console.log(ReflectionUtils.cloneObject(user));
+         console.log(ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user)));
+         
+         $scope.data.userClone = ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user));
+        
     }
     
     
