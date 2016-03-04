@@ -13,7 +13,6 @@
     
     <!--<div>Errors: <b>{{errors|json}}</b></div>-->
     <div>Validation Errors: <b>{{validationErrors|json}}</b></div>
-
     <div>Total: <b>{{user.total}}</b></div>
     <div>Total number: <b>{{user.totalNumber.toString()}}</b></div>
 </div>
@@ -24,21 +23,21 @@
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Name</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly ng-model="user.sg_name" sg-bind  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Name">
+                    <input type="text" readonly sg-model sg-bind ng-model="user.name" class="form-control" id="name" name="name" placeholder="Enter Name">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Number1</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly ng-model="user.address.note.sg_number1" sg-bind to-big  ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number1">
+                    <input type="text" readonly sg-model sg-bind to-big ng-model="user.address.note.number1" class="form-control" id="name" name="name" placeholder="Enter Number1">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Number2</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly ng-model="user.address.note.sg_number2" sg-bind to-big ng-model-options="{ getterSetter: true }" class="form-control" id="name" name="name" placeholder="Enter Number2">
+                    <input type="text" readonly sg-model sg-bind to-big ng-model="user.address.note.number2" class="form-control" id="name" name="name" placeholder="Enter Number2">
                 </div>
             </div>
             
@@ -46,7 +45,7 @@
                 <label for="name" class="col-sm-2 control-label">Geek</label>                       
                 <div class="col-sm-10">
                         
-                    <input type="checkbox" disabled ng-model="user.sg_geek" sg-bind  ng-model-options="{ getterSetter: true }" id="name" name="name" placeholder="Enter Name">
+                    <input type="checkbox" disabled readonly sg-model sg-bind ng-model="user.geek"  id="name" name="name" placeholder="Enter Name">
                     
                 </div>
             </div>
@@ -54,14 +53,14 @@
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Email</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-bind ng-model="user.sg_email" ng-model-options="{ getterSetter: true }" class="form-control" id="email" name="email" placeholder="Enter Email">
+                    <input type="text" readonly sg-model sg-bind ng-model="user.email" class="form-control" id="email" name="email" placeholder="Enter Email">
                 </div>
             </div>
             
              <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">Street</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-bind ng-model="user.address.sg_street" ng-model-options="{ getterSetter: true }" class="form-control" id="street" name="street" placeholder="Enter Street">
+                    <input type="text" readonly sg-model sg-bind ng-model="user.address.street" class="form-control" id="street" name="street" placeholder="Enter Street">
                 </div>
             </div>
             
@@ -69,7 +68,7 @@
             <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">City</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-bind ng-model="user.address.sg_city" ng-model-options="{ getterSetter: true }" class="form-control" id="city" name="city" placeholder="Enter City">
+                    <input type="text" readonly sg-model sg-bind ng-model="user.address.city" ng-model-options="{ getterSetter: true }" class="form-control" id="city" name="city" placeholder="Enter City">
                 </div>
             </div>
             
@@ -84,14 +83,14 @@
             <div class="form-group">
                 <label for="firstname" class="col-sm-2 control-label">Value2</label>                       
                 <div class="col-sm-10">
-                    <input type="number" readonly sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="number" readonly sg-model sg-bind ng-model="user.value2" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="noteValue" class="col-sm-2 control-label">Note value</label>                       
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-bind ng-model="user.address.note.sg_value" ng-model-options="{ getterSetter: true }" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="text" readonly sg-model sg-bind ng-model="user.address.note.value" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
             
@@ -109,7 +108,7 @@
     <!--Number2: <input type="text" sg-bind ng-model="user.sg_number2" ng-model-options="{ getterSetter: true }" /><br/>-->
 </div>
 
-<div>User: <b>{{user|json}}</b></div>
+<div>User: <b>{{user|json}}</b></div></br>
 <div>User clone: <b>{{data.userClone|json}}</b></div>
 
 <script>

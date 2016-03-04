@@ -42,56 +42,58 @@ angular.module('test1App')
     })
 
 
+.directive('sgModel', function ($compile) {
+    return {
+        priority:1,
+        restrict: 'A',
+        require:  ['ngModel', '^?ngModelOptions'],
+        compile: function(element, attributes, ngModel){
+            
+            /*if( (~!!attributes.ngModel.indexOf('sg_'))) {*/
+                
+            var lastIndex = attributes.ngModel.lastIndexOf('.');
+            var part1 = attributes.ngModel.substr(0, lastIndex+1);
+            var part2 = 'sg_'+attributes.ngModel.substr(lastIndex+1, attributes.ngModel.length);
+                    
+            attributes.ngModel = part1+part2;
+            //}           
+
+            
+            return {
+                
+                pre: function (scope, element, attr, ctrls) {
+                    
+                    //DataBindingContext.addBinding(attr.ngModel.replace("sg_",""), element[0]);
+                    
+                    var modelCtrl = ctrls[0];
+                    ctrls[2] = {};
+                    ctrls[2].$options = {};                   
+                
+                    
+                    ctrls[2].$options['getterSetter'] = true;
+                    ctrls[2].$options['updateOnDefault'] = true;   
+                    
+                    modelCtrl.$$setOptions(ctrls[2] && ctrls[2].$options);    
+                 
+                },
+             }
+         },
+    }
+})
+
+
   .directive('sgBind', function () {
     return {
+        priority:1,
         restrict: 'A', // only activate on element attribute
-        require: 'ngModel', // get a hold of NgModelController
+        require:  ['ngModel', '^?form', '^?ngModelOptions'], // get a hold of NgModelController
         link: function (scope, element, attrs, ngModel) {
-            
-            /*if (!ngModel.$options) {
-				ngModel.$options = {
-                    getterSetter: true,
-                    updateOnDefault: true,
-				};
-			}*/
-            
-            DataBindingContext.addBinding(attrs.ngModel.replace("sg_",""), element[0]);
-            
-            /*ngModel.$formatters.push(function(value){
-                
-                    console.log("==================> '"+value+"'");
-                    return 1;
-            });*/
-            
-            /*console.log("==================>");
-            console.log(element[0].parentElement);
-            
-            console.log(attrs.ngModel);
-            console.log(element[0].parent);
-            console.log("==================>");*/
-            
-            /*scope.$watch(attrs.ngModel, function (v) {
-                if (v) {
-                    console.log('value changed, new value is: ' + v + ' ' + v.length);
-                    if (v.length > 5) {
-                        var newzip = v.replace("-", '');
-                        var str = newzip.substring(0, 5) + '-' + newzip.substring(5, newzip.length);
-                        element.val(str);
-
-                    } else {
-                        element.val(v);
-                    }
-
-                }
-
-            });*/
-
+            DataBindingContext.addBinding(attrs.ngModel.replace('sg_',''), element[0]);
         }
     }
   })
 
   .controller('AboutCtrl', function ($scope) {
-    
     
     $scope.validationErrors = ValidationErrors.getErrors();
     
@@ -100,65 +102,27 @@ angular.module('test1App')
     }
     $scope.data = data;
     
-    
-    
-    
     var user = {
         
-        
-        //sa$value1 : { notEmptyValidation: {},  calculation: {}  }, 
-        value1 : 9007199254740994,
-         
-        //sa$value2 : [ {notEmpty: {}}, { calculation: {} } ], 
-        //sa$value2 : { notEmptyValidation: {},  calculation: {}  }, 
+        value1 : 9007199254740990,
         value2 : 0.9999,
-         
-        //sa$email : { notEmptyValidation: {}, emailValidation: {} }, 
         email: null,
-        
-        
         total: 0,
         totalNumber: 0,
-        
-        //sa$name : { notEmptyValidation: {} } , 
         name : 'Pablo', 
-        
         geek: true,
         
-         
-        //sa$address: { beanValidation: {} },
         address: {
-            //sa$street : { notEmptyValidation: {} },
             street: null,
-            
-            //sa$city : { notEmptyValidation: {} },
-            city: 'Košice',
-            
-            //sa$note: { beanValidation: {} },
+            city: 'Košice',            
             note: {
                 value: null,
-                number1: 9007199254740994,
+                number1: 9007199254740990,
                 number2: 0.9999,
             },
             
         },
-         
-         
-        /*sgName: function(newValue) {
-              
-            if(newValue) {
-                console.log('set call '+newValue);
-                  
-            }
-            else {
-                console.log('get call');
-            }    
-            return arguments.length ? (this.name = newValue) : this.name;
-        }*/
      };
-    
-    //this is very important
-    user[ShadowAnnotationConstants.key] = 'shadow.object.key.user';
     
     var userShadow = {
         
@@ -184,22 +148,16 @@ angular.module('test1App')
         },
      };
     
-    ShadowAnnotationRegister.addShadowObject(user.sa$sa, userShadow);
+    //ShadowAnnotationsRegister.addShadowObject(user.sa$sa, userShadow);
     
-    
+    DataBindingContext.bind('user', user, userShadow);
     ReflectionUtils.createSettersGetters(user);
     
+    
     $scope.user = user;
-    
     var userClone = ReflectionUtils.cloneObject(user);
-    
     ReflectionUtils.convertFrom(userClone);
-    
     $scope.data.userClone = userClone;
-    
-    
-    
-    //doUpdateUi();
     
     $scope.fireValidation = fireValidation;
     
@@ -225,8 +183,6 @@ angular.module('test1App')
             
             if(!editMode) {
             
-                
-                
                 if(bindings[i].getAttribute('type')=='checkbox') {
                     bindings[i].removeAttribute('disabled');    
                 }
@@ -270,10 +226,6 @@ angular.module('test1App')
     
     function convertFrom() {
         
-         console.log("Converting from call");
-         console.log(ReflectionUtils.cloneObject(user));
-         console.log(ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user)));
-         
          $scope.data.userClone = ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user));
         
     }
