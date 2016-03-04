@@ -114,7 +114,7 @@ angular.module('test1App')
         
         address: {
             street: null,
-            city: 'Košice',            
+            city: 'Humenné',            
             note: {
                 value: null,
                 number1: 9007199254740990,
@@ -137,7 +137,7 @@ angular.module('test1App')
         address: {
             
             sa$street : { notEmptyValidation: {} },
-            sa$city : { notEmptyValidation: {} },
+            sa$city : { notEmptyValidation: {}, cityParamsValidation : {} },
             
             sa$note: { beanValidation: {} },
             note: {

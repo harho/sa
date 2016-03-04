@@ -562,8 +562,8 @@ var ShadowAnnotationsRegister = (function () {
     };
 
     return {
-        addValidator : function (annotationName, validator) {
-            return addValidator(annotationName, validator);
+        addValidator : function (validator) {
+            return addValidator(validator.getAnnotationName(), validator);
         },
         getValidator : function (annotationName) {
             return validators[annotationName];
@@ -575,9 +575,9 @@ var ShadowAnnotationsRegister = (function () {
         getShadowObject : function (obj) {
             return getShadowObject(obj);  
         },
-        addConverter : function (annotationName, converter) {
+        addConverter : function (converter) {
             
-            return addConverter(annotationName, converter);
+            return addConverter(converter.getAnnotationName(), converter);
         },
         getConverter : function (annotationName) {
             return converters[annotationName];
@@ -585,8 +585,8 @@ var ShadowAnnotationsRegister = (function () {
         getAllConverters : function () {
             return converters;
         },
-        addProcessor : function (annotationName, processor) {
-            return addProcessor(annotationName, processor);
+        addProcessor : function (processor) {
+            return addProcessor(processor.getAnnotationName(), processor);
         },
         getProcessor : function (annotationName) {
             return processors[annotationName];
@@ -630,7 +630,7 @@ var NotEmptyValidator = (function () {
     };
 }());
 
-ShadowAnnotationsRegister.addValidator('notEmptyValidation', NotEmptyValidator);
+ShadowAnnotationsRegister.addValidator(NotEmptyValidator);
 
 
 var EmailValidator = (function () {
@@ -669,7 +669,7 @@ var EmailValidator = (function () {
     };
 }());
 
-ShadowAnnotationsRegister.addValidator('emailValidation', EmailValidator);
+ShadowAnnotationsRegister.addValidator(EmailValidator);
 
 var BeanValidator = (function () {
     'use strict';
@@ -747,7 +747,7 @@ var BeanValidator = (function () {
     };
 }());
 
-ShadowAnnotationsRegister.addValidator('beanValidation', BeanValidator);
+ShadowAnnotationsRegister.addValidator(BeanValidator);
 
 var BigConverter = (function () {
     'use strict';
@@ -801,7 +801,7 @@ var BigConverter = (function () {
     };
 }());
 
-ShadowAnnotationsRegister.addConverter('bigConversion', BigConverter);
+ShadowAnnotationsRegister.addConverter(BigConverter);
 
 var Calculation = (function () {
     'use strict';
@@ -836,7 +836,42 @@ var Calculation = (function () {
     };
 }());
 
-ShadowAnnotationsRegister.addProcessor('calculation', Calculation);
+ShadowAnnotationsRegister.addProcessor(Calculation);
+
+var CityParamsValidator = (function () {
+    'use strict';
+
+    var annotationName = 'cityParamsValidation';
+
+    var doValidation = function (sa, property, obj) {
+        
+        var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+        
+        
+        if(propertyValue==='' || propertyValue===null || ! CityParams.findByName(propertyValue)) {
+            
+            ValidationErrors.addError({ property: property, errorKey: annotationName, objectKey: obj[ShadowAnnotationsConstants.key] });
+            
+        }
+        else {
+            
+            ValidationErrors.removeError(property, annotationName);
+        }
+    };
+
+    return {
+        doValidation : function (sa, property, obj) {
+            return doValidation(sa, property, obj);
+        },
+        getAnnotationName: function() {
+            return annotationName;
+        }
+
+    };
+}());
+
+ShadowAnnotationsRegister.addValidator(CityParamsValidator);
+
 
 
 
