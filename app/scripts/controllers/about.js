@@ -69,7 +69,6 @@ angular.module('test1App')
                     ctrls[2] = {};
                     ctrls[2].$options = {};                   
                 
-                    
                     ctrls[2].$options['getterSetter'] = true;
                     ctrls[2].$options['updateOnDefault'] = true;   
                     
@@ -150,24 +149,20 @@ angular.module('test1App')
     
     //ShadowAnnotationsRegister.addShadowObject(user.sa$sa, userShadow);
     
-    DataBindingContext.bind('user', user, userShadow);
-    ReflectionUtils.createSettersGetters(user);
-    
-    
+    ShadowAnnotations.link('user', user, userShadow, true);
     $scope.user = user;
+    
     var userClone = ReflectionUtils.cloneObject(user);
     ReflectionUtils.convertFrom(userClone);
     $scope.data.userClone = userClone;
     
     $scope.fireValidation = fireValidation;
-    
     var fireValidationCalled = false;
-        
     function fireValidation() {
         
         if(!fireValidationCalled) {
             BeanValidator.doValidation(null, null, user);    
-            UiUtils.updateUi();
+            ShadowAnnotationsRegister.getUiUpdater().updateUi();
             fireValidationCalled = true;
         }
     }
@@ -208,14 +203,14 @@ angular.module('test1App')
         if(!editMode) {
             
             DataBindingContext.enable();
-            BeanValidator.doValidation(null, null, user);    
-            UiUtils.updateUi();
+            ShadowAnnotations.doValidation(user);    
+            ShadowAnnotations.updateUi();
             fireValidationCalled = true;
         }
         else {
             DataBindingContext.disable();
             ValidationErrors.removeAllErrors();
-            UiUtils.updateUi();
+            ShadowAnnotations.updateUi();
         }
         
         
@@ -229,9 +224,6 @@ angular.module('test1App')
          $scope.data.userClone = ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user));
         
     }
-    
-    
-    
     
     
   });

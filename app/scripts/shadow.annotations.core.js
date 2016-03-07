@@ -9,12 +9,111 @@
 })();
 
 
+var ShadowAnnotations = (function () {
+    'use strict';
+
+    return {
+        
+        
+        //
+        // UiUpdater
+        //
+        updateUi : function () {
+            ShadowAnnotationsRegister.getUiUpdater().updateUi();
+        },
+        
+        //
+        // BeanValidator methods 
+        //
+        
+        doValidation : function (obj) {
+            BeanValidator.doValidation(null, null, obj);
+        },
+        
+        //
+        // DataBindingContext
+        //
+        addBinding : function (property, element) {  
+            return DataBindingContext.addBinding(property, element);
+        },
+        getBindings : function () {  
+            return DataBindingContext.getBindings();
+        },
+        isEnabled : function () {  
+            return DataBindingContext.isEnabled();
+        },
+        enable : function () {  
+            return DataBindingContext.enable();
+        },
+        disable : function () {  
+            return DataBindingContext.disable();
+        },
+        /* Deside the name of this function bind ? link */
+        bind : function (key, obj, shadowObj, createSettersGetters) {
+            link(key, obj, shadowObj, createSettersGetters);
+        },
+        link : function (key, obj, shadowObj, createSettersGetters) {
+        
+            DataBindingContext.bind(key, obj, shadowObj);
+        
+            if(createSettersGetters) {
+                ReflectionUtils.createSettersGetters(obj);
+            }
+        },        
+        
+        
+        //
+        // ShadowAnnotationsRegister methods 
+        //
+        addValidator : function (validator) {
+            return ShadowAnnotationsRegister.addValidator(validator.getAnnotationName(), validator);
+        },
+        /*getValidator : function (annotationName) {
+            return ShadowAnnotationsRegister.getValidator(annotationName);
+        },*/
+        addShadowObject : function (shadowObjectKey, shadowObject) {
+            return ShadowAnnotationsRegister.addShadowObject(shadowObjectKey, shadowObject);
+        },
+        /*getShadowObject : function (obj) {
+            return ShadowAnnotationsRegister.getShadowObject(obj);  
+        },*/
+        addConverter : function (converter) {
+            return ShadowAnnotationsRegister.addConverter(converter.getAnnotationName(), converter);
+        },
+        /*getConverter : function (annotationName) {
+            return ShadowAnnotationsRegister.getConverter(annotationName);
+        },*/
+        /*getAllConverters : function () {
+            return ShadowAnnotationsRegister.getAllConverters();
+        },*/
+        addProcessor : function (processor) {
+            return ShadowAnnotationsRegister.ddProcessor(processor.getAnnotationName(), processor);
+        },
+        /*getProcessor : function (annotationName) {
+            return ShadowAnnotationsRegister.getProcessor(annotationName);
+        },*/
+        addProcessor : function (processor) {
+            return ShadowAnnotationsRegister.addProcessor(processor);
+        },
+        setUiUpdater : function (updater) {
+            ShadowAnnotationsRegister.setUiUpdater(processor);
+        },
+        /*getUiUpdater : function (updater) {
+            ShadowAnnotationsRegister.getUiUpdater();
+        },*/
+    };
+    
+}());
+
+
 var ShadowAnnotationsConstants = (function () {
     'use strict';
 
     return {
         prefix : 'sa$',
-        key : 'sa$sa'
+        key : 'sa$sa',
+        setGetPrefix : 'sg_'
+        
     };
 }());
 
@@ -92,163 +191,7 @@ var ValidationErrors = (function () {
     };
 }());
 
-var ShadowAnnotationsRegister = (function () {
-    'use strict';
 
-    var converters = {};
-    var validators = {};
-    var processors = {};
-    var shadowObjects = {};
-    
-    var addProcessor = function (annotationName, processor) {  
-        //console.log('Adding processor for annotation '+annotationName);
-        processors[annotationName] = processor;
-    };
-    
-    
-    var addConverter = function (annotationName, converter) {
-        
-        //console.log('Adding converter for annotation '+annotationName);
-        converters[annotationName] = converter;
-        
-    };
-    
-    var addValidator = function (annotationName, validator) {
-        
-        //console.log('Adding validation for annotation '+annotationName);
-        validators[annotationName] = validator;
-        
-    };
-    var addShadowObject = function (shadowObjectKey, shadowObject) {
-        
-        //console.log('Adding shadow object  '+shadowObjectKey);
-        shadowObjects[shadowObjectKey] = shadowObject;
-        
-    };
-    
-    var getShadowObject = function (obj) {
-        
-        return obj.sa$sa ? shadowObjects[obj.sa$sa] : obj;
-    };
-
-    return {
-        addValidator : function (annotationName, validator) {
-            return addValidator(annotationName, validator);
-        },
-        getValidator : function (annotationName) {
-            return validators[annotationName];
-        },
-        
-        addShadowObject : function (shadowObjectKey, shadowObject) {
-            return addShadowObject(shadowObjectKey, shadowObject);
-        },
-        getShadowObject : function (obj) {
-            return getShadowObject(obj);  
-        },
-        addConverter : function (annotationName, converter) {
-            
-            return addConverter(annotationName, converter);
-        },
-        getConverter : function (annotationName) {
-            return converters[annotationName];
-        },
-        getAllConverters : function () {
-            return converters;
-        },
-        addProcessor : function (annotationName, processor) {
-            return addProcessor(annotationName, processor);
-        },
-        getProcessor : function (annotationName) {
-            return processors[annotationName];
-        },
-    };
-}());
-
-
-
-
-var UiUtils = (function () {
-    'use strict';
-
-    function updateUi() {
-        
-        var validationErrors = ValidationErrors.getErrors();
-        
-        var bindings = DataBindingContext.getBindings();
-        
-        if(validationErrors.length>0) {
-            var errorsContent = '';
-            var errorsPerPath = {};
-            //console.log(errorsPerPath);
-            //console.log('validationErrors.length: '+validationErrors.length);
-            
-            for (var i = 0; i < validationErrors.length; i++) {
-                
-                errorsContent +=validationErrors[i].property+' '+validationErrors[i].errorKey+'<br/>';
-                
-                if(errorsPerPath[validationErrors[i].property]) {
-                    errorsPerPath[validationErrors[i].property].errorMessage += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
-                }
-                else {
-                    errorsPerPath[validationErrors[i].property] = {property: validationErrors[i].property, errorMessage: validationErrors[i].property+' '+validationErrors[i].errorKey };
-                    errorsPerPath[validationErrors[i].property].objectKey = validationErrors[i].objectKey;
-                }
-            }
-            
-            removeTooltipAttributes(bindings);
-            
-            addTooltipAttributes(bindings, errorsPerPath);
-            
-            document.getElementById('all-errors').setAttribute('data-content', errorsContent);
-            
-            $(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-            });
-            
-        }
-        else {
-            
-            removeTooltipAttributes(bindings);
-            
-            document.getElementById('all-errors').removeAttribute('data-content');
-        }
-    }
-    
-    function addTooltipAttributes(bindings, errorsPerPath) {
-        
-        for (var i in errorsPerPath ) {
-                
-            //console.log(errorsPerPath[i].objectKey);
-                
-            var formControlDiv = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property].parentNode.parentNode;
-            formControlDiv.className='form-group has-error';
-                    
-            formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
-            formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
-            formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
-                
-        }
-    } 
-    
-    function removeTooltipAttributes(bindings) {
-        for (var i in bindings ) {
-                
-            var formControlDiv = bindings[i].parentNode.parentNode;
-                
-            formControlDiv.className='form-group';
-                    
-            formControlDiv.childNodes[1].removeAttribute('data-original-title');
-            formControlDiv.childNodes[1].removeAttribute('data-placement');
-            formControlDiv.childNodes[1].removeAttribute('data-toggle');
-        }
-    }
-
-    return {
-        updateUi : function () {
-            updateUi();
-        },
-    };
-}());
 
 var ReflectionUtils = (function () {
     'use strict';
@@ -326,7 +269,7 @@ var ReflectionUtils = (function () {
             }
         }
         
-        obj['sg_' + name] = function(newValue) {
+        obj[ShadowAnnotationsConstants.setGetPrefix + name] = function(newValue) {
             
             
             
@@ -347,7 +290,7 @@ var ReflectionUtils = (function () {
                         
                         processAnnotations(rootObj, path ? path+'.'+name: name);
                         
-                        UiUtils.updateUi();
+                        ShadowAnnotationsRegister.getUiUpdater().updateUi();
                     }
                 }   
             }
@@ -419,7 +362,7 @@ var ReflectionUtils = (function () {
         for ( var i in obj ) {
            if (obj.hasOwnProperty(i)) {
                     
-               if( !(i.indexOf('sa$') > -1) && !(i.indexOf('sg_') > -1)) {
+               if( !(i.indexOf(ShadowAnnotationsConstants.prefix) > -1) && !(i.indexOf(ShadowAnnotationsConstants.setGetPrefix) > -1)) {
                     //console.log('----> Converting property: '+i);
                         
                     if(isObject(obj[i])) {
@@ -449,7 +392,7 @@ var ReflectionUtils = (function () {
         var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
         //console.log(obj2['sa$'+propertyName]);
         //console.log('/-----------------------------------');
-        return obj2['sa$'+propertyName];
+        return obj2[ShadowAnnotationsConstants.prefix+propertyName];
         
         
     }
@@ -525,6 +468,7 @@ var ReflectionUtils = (function () {
 var ShadowAnnotationsRegister = (function () {
     'use strict';
 
+    var uiUpdater = null;
     var converters = {};
     var validators = {};
     var processors = {};
@@ -590,6 +534,15 @@ var ShadowAnnotationsRegister = (function () {
         },
         getProcessor : function (annotationName) {
             return processors[annotationName];
+        },
+        addProcessor : function (processor) {
+            return addProcessor(processor.getAnnotationName(), processor);
+        },
+        setUiUpdater : function (updater) {
+            uiUpdater = updater;
+        },
+        getUiUpdater : function (updater) {
+            return uiUpdater
         },
     };
 }());
@@ -872,6 +825,90 @@ var CityParamsValidator = (function () {
 
 ShadowAnnotationsRegister.addValidator(CityParamsValidator);
 
+var UiUpdater = (function () {
+    'use strict';
+
+    function updateUi() {
+        
+        var validationErrors = ValidationErrors.getErrors();
+        
+        var bindings = DataBindingContext.getBindings();
+        
+        if(validationErrors.length>0) {
+            var errorsContent = '';
+            var errorsPerPath = {};
+            //console.log(errorsPerPath);
+            //console.log('validationErrors.length: '+validationErrors.length);
+            
+            for (var i = 0; i < validationErrors.length; i++) {
+                
+                errorsContent +=validationErrors[i].property+' '+validationErrors[i].errorKey+'<br/>';
+                
+                if(errorsPerPath[validationErrors[i].property]) {
+                    errorsPerPath[validationErrors[i].property].errorMessage += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
+                }
+                else {
+                    errorsPerPath[validationErrors[i].property] = {property: validationErrors[i].property, errorMessage: validationErrors[i].property+' '+validationErrors[i].errorKey };
+                    errorsPerPath[validationErrors[i].property].objectKey = validationErrors[i].objectKey;
+                }
+            }
+            
+            removeTooltipAttributes(bindings);
+            
+            addTooltipAttributes(bindings, errorsPerPath);
+            
+            document.getElementById('all-errors').setAttribute('data-content', errorsContent);
+            
+            $(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+            });
+            
+        }
+        else {
+            
+            removeTooltipAttributes(bindings);
+            
+            document.getElementById('all-errors').removeAttribute('data-content');
+        }
+    }
+    
+    function addTooltipAttributes(bindings, errorsPerPath) {
+        
+        for (var i in errorsPerPath ) {
+                
+            //console.log(errorsPerPath[i].objectKey);
+                
+            var formControlDiv = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property].parentNode.parentNode;
+            formControlDiv.className='form-group has-error';
+                    
+            formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
+            formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
+            formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+                
+        }
+    } 
+    
+    function removeTooltipAttributes(bindings) {
+        for (var i in bindings ) {
+                
+            var formControlDiv = bindings[i].parentNode.parentNode;
+                
+            formControlDiv.className='form-group';
+                    
+            formControlDiv.childNodes[1].removeAttribute('data-original-title');
+            formControlDiv.childNodes[1].removeAttribute('data-placement');
+            formControlDiv.childNodes[1].removeAttribute('data-toggle');
+        }
+    }
+
+    return {
+        updateUi : function () {
+            updateUi();
+        },
+    };
+}());
+
+ShadowAnnotationsRegister.setUiUpdater(UiUpdater);
 
 
 
