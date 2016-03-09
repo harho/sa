@@ -3,14 +3,14 @@
 
 
     <div></div>
-    
+
     <div>
         <span id="all-errors" class="badge alert-danger" data-toggle="popover" data-trigger="hover" data-html="true">{{validationErrors.length}}</span> <b>Form</b>
-        
+
         <button class="btn btn-primary btn-sm" ng-click="enableEdit()">Edit</button>
         <button class="btn btn-primary btn-sm" ng-click="convertFrom()">Convert from</button>
     </div>
-    
+
     <!--<div>Errors: <b>{{errors|json}}</b></div>-->
     <div>Validation Errors: <b>{{validationErrors|json}}</b></div>
     <div>Total: <b>{{user.total}}</b></div>
@@ -19,93 +19,93 @@
 <div class="row">
     <div class="col-xs-12 col-sm-7">
         <form class="form-horizontal" role="form">
-            
+
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">Name</label>                       
+                <label for="name" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind ng-model="user.name" class="form-control" id="name" name="name" placeholder="Enter Name">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.name" class="form-control" id="name" name="name" placeholder="Enter Name">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">Number1</label>                       
+                <label for="name" class="col-sm-2 control-label">Number1</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind to-big ng-model="user.address.note.number1" class="form-control" id="name" name="name" placeholder="Enter Number1">
+                    <input type="text" readonly sa-model sa-bind to-big ng-model="user.address.note.number1" class="form-control" id="name" name="name" placeholder="Enter Number1">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">Number2</label>                       
+                <label for="name" class="col-sm-2 control-label">Number2</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind to-big ng-model="user.address.note.number2" class="form-control" id="name" name="name" placeholder="Enter Number2">
+                    <input type="text" readonly sa-model sa-bind to-big ng-model="user.address.note.number2" class="form-control" id="name" name="name" placeholder="Enter Number2">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">Geek</label>                       
+                <label for="name" class="col-sm-2 control-label">Geek</label>
                 <div class="col-sm-10">
-                        
-                    <input type="checkbox" disabled readonly sg-model sg-bind ng-model="user.geek"  id="name" name="name" placeholder="Enter Name">
-                    
+
+                    <input type="checkbox" disabled readonly sa-model sa-bind ng-model="user.geek"  id="name" name="name" placeholder="Enter Name">
+
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="firstname" class="col-sm-2 control-label">Email</label>                       
+                <label for="firstname" class="col-sm-2 control-label">Email</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind ng-model="user.email" class="form-control" id="email" name="email" placeholder="Enter Email">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.email" class="form-control" id="email" name="email" placeholder="Enter Email">
                 </div>
             </div>
-            
+
              <div class="form-group">
-                <label for="email" class="col-sm-2 control-label">Street</label>                       
+                <label for="email" class="col-sm-2 control-label">Street</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind ng-model="user.address.street" class="form-control" id="street" name="street" placeholder="Enter Street">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.address.street" class="form-control" id="street" name="street" placeholder="Enter Street">
                 </div>
             </div>
-            
-            
+
+
             <div class="form-group">
-                <label for="email" class="col-sm-2 control-label">City</label>                       
+                <label for="email" class="col-sm-2 control-label">City</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind ng-model="user.address.city" class="form-control" id="city" name="city" placeholder="Enter City">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.address.city" class="form-control" id="city" name="city" placeholder="Enter City">
                 </div>
             </div>
-            
-            
+
+
             <div class="form-group">
-                <label for="firstname" class="col-sm-2 control-label">Value1</label>                       
+                <label for="firstname" class="col-sm-2 control-label">Value1</label>
                 <div class="col-sm-10">
-                    <input type="number" readonly sg-model sg-bind ng-model="user.value1" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
+                    <input type="number" readonly sa-model sa-bind ng-model="user.value1" class="form-control" id="value1" name="value1" placeholder="Enter Value1">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="firstname" class="col-sm-2 control-label">Value2</label>                       
+                <label for="firstname" class="col-sm-2 control-label">Value2</label>
                 <div class="col-sm-10">
-                    <input type="number" readonly sg-model sg-bind ng-model="user.value2" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="number" readonly sa-model sa-bind ng-model="user.value2" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="noteValue" class="col-sm-2 control-label">Note value</label>                       
+                <label for="noteValue" class="col-sm-2 control-label">Note value</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sg-model sg-bind ng-model="user.address.note.value" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.address.note.value" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
             </div>
-            
-            
-            
-        </form>    
+
+
+
+        </form>
     </div>
-    
-    
-    <!--Name: <input type="text" sg-bind ng-model="user.name"/><br/>-->
-    <!--Name: <input type="text" sg-bind ng-model="user.sg_name" ng-model-options="{ getterSetter: true }" /><br/>-->
-    <!--Value1: <input type="text" sg-bind ng-model="user.value1"  /><br/>-->
-    <!--Value2: <input type="text" sg-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" /><br/>-->
-    <!--Number1: <input type="text" sg-bind ng-model="user.sg_number1" ng-model-options="{ getterSetter: true }" /><br/>-->
-    <!--Number2: <input type="text" sg-bind ng-model="user.sg_number2" ng-model-options="{ getterSetter: true }" /><br/>-->
+
+
+    <!--Name: <input type="text" sa-bind ng-model="user.name"/><br/>-->
+    <!--Name: <input type="text" sa-bind ng-model="user.sg_name" ng-model-options="{ getterSetter: true }" /><br/>-->
+    <!--Value1: <input type="text" sa-bind ng-model="user.value1"  /><br/>-->
+    <!--Value2: <input type="text" sa-bind ng-model="user.sg_value2" ng-model-options="{ getterSetter: true }" /><br/>-->
+    <!--Number1: <input type="text" sa-bind ng-model="user.sg_number1" ng-model-options="{ getterSetter: true }" /><br/>-->
+    <!--Number2: <input type="text" sa-bind ng-model="user.sg_number2" ng-model-options="{ getterSetter: true }" /><br/>-->
 </div>
 
 <div>User: <b>{{user|json}}</b></div></br>
@@ -115,7 +115,7 @@
         $(document).ready(function(){
         $('[data-toggle="tooltip"]').tooltip();
          });
-    
+
         $(function () {
   $('[data-toggle="popover"]').popover()
 })
@@ -126,4 +126,4 @@
 <br/>
 <br/>
 
-    <!--Value1: <input type="text" sg-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" /><br/>-->
+    <!--Value1: <input type="text" sa-bind ng-model="user.sg_value1" ng-model-options="{ getterSetter: true }" /><br/>-->
