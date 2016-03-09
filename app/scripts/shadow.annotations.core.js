@@ -17,11 +17,7 @@ var ShadowAnnotations = (function () {
     // UiUpdater
     //
     updateUi : function () {
-      var uiUpdater = ShadowAnnotationsRegister.getUiUpdater();
-      console.log(uiUpdater);
-      if(uiUpdater) {
-        uiUpdater.updateUi();
-      }
+      ShadowAnnotationsRegister.getUiUpdater().updateUi();
     },
 
     //
@@ -128,8 +124,10 @@ var DataBindingContext = (function () {
 
   var bind = function (key, obj, shadowObj) {
 
-    obj[ShadowAnnotationsConstants.key]=key;
-    ShadowAnnotationsRegister.addShadowObject(key, shadowObj);
+    if(obj) {
+      obj[ShadowAnnotationsConstants.key] = key;
+      ShadowAnnotationsRegister.addShadowObject(key, shadowObj);
+    }
   };
 
   return {
@@ -502,7 +500,10 @@ var ShadowAnnotationsRegister = (function () {
 
   var getShadowObject = function (obj) {
 
-    return obj.sa$sa ? shadowObjects[obj.sa$sa] : obj;
+    if(obj) {
+      return obj[ShadowAnnotationsConstants.key] ? shadowObjects[obj[ShadowAnnotationsConstants.key]] : obj;
+    }
+    return obj;
   };
 
   return {
@@ -537,7 +538,6 @@ var ShadowAnnotationsRegister = (function () {
       return processors[annotationName];
     },
     setUiUpdater : function (updater) {
-      console.log("Setting Ui updater.");
       uiUpdater = updater;
     },
     getUiUpdater : function (updater) {
@@ -750,3 +750,4 @@ var BigConverter = (function () {
 }());
 
 ShadowAnnotationsRegister.addConverter(BigConverter);
+
