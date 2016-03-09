@@ -12,7 +12,7 @@ angular.module('test1App')
     .directive('toBig', function(){
         return{
             restrict: 'A',
-            require: 'saModel',
+            require: 'ngModel',
             link: function(scope, element, attr, ngModel){
 
                 ngModel.$formatters.push(function(value){
@@ -81,7 +81,7 @@ angular.module('test1App')
 })
 
 
-  .directive('sgBind', function () {
+  .directive('saBind', function () {
     return {
         priority:1,
         restrict: 'A', // only activate on element attribute
