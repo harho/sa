@@ -42,14 +42,11 @@ var UiUpdater = (function () {
     var bindings = DataBindingContext.getBindings();
 
     if(validationErrors.length>0) {
-      var errorsContent = '';
       var errorsPerPath = {};
       //console.log(errorsPerPath);
       //console.log('validationErrors.length: '+validationErrors.length);
 
       for (var i = 0; i < validationErrors.length; i++) {
-
-        errorsContent +=validationErrors[i].property+' '+validationErrors[i].errorKey+'<br/>';
 
         if(errorsPerPath[validationErrors[i].property]) {
           errorsPerPath[validationErrors[i].property].errorMessage += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
@@ -64,7 +61,6 @@ var UiUpdater = (function () {
 
       addTooltipAttributes(bindings, errorsPerPath);
 
-      document.getElementById('all-errors').setAttribute('data-content', errorsContent);
 
       $(function () {
         $('[data-toggle="tooltip"]').tooltip();
@@ -72,10 +68,7 @@ var UiUpdater = (function () {
 
     }
     else {
-
       removeTooltipAttributes(bindings);
-
-      document.getElementById('all-errors').removeAttribute('data-content');
     }
   }
 
@@ -116,3 +109,79 @@ var UiUpdater = (function () {
 }());
 
 ShadowAnnotationsRegister.setUiUpdater(UiUpdater);
+
+
+var AdditionalUiUpdater = (function () {
+  'use strict';
+
+  function updateUi() {
+
+    var validationErrors = ValidationErrors.getErrors();
+
+    var bindings = DataBindingContext.getBindings();
+
+    if(validationErrors.length>0) {
+      var errorsContent = '';
+
+      for (var i = 0; i < validationErrors.length; i++) {
+        errorsContent +=validationErrors[i].property+' '+validationErrors[i].errorKey+'<br/>';
+      }
+
+      document.getElementById('all-errors').setAttribute('data-content', errorsContent);
+
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+
+    }
+    else {
+
+      document.getElementById('all-errors').removeAttribute('data-content');
+    }
+  }
+
+
+  return {
+    updateUi : function () {
+      updateUi();
+    },
+  };
+}());
+
+ShadowAnnotationsRegister.addAdditionalUiUpdater(AdditionalUiUpdater);
+
+
+var Calculation = (function () {
+  'use strict';
+  var annotationName = 'calculation';
+
+
+  var isBig = function (obj) {
+    /* jshint validthis:true */
+    return (!!obj) && (obj.constructor === Big);
+  };
+
+  var process = function (sa, property, obj) {
+
+    //console.log('Calculation call.');
+    //console.log(obj);
+    obj.total = obj.value1 + obj.value2;
+
+    if(obj.address.note.number1 && obj.address.note.number2 && isBig(obj.address.note.number2)) {
+      obj.totalNumber = obj.address.note.number1.plus(obj.address.note.number2);
+    }
+
+  };
+
+  return {
+    process : function (sa, property, obj) {
+      return process(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+ShadowAnnotationsRegister.addProcessor(Calculation);

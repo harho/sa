@@ -18,6 +18,10 @@ var ShadowAnnotations = (function () {
     //
     updateUi : function () {
       ShadowAnnotationsRegister.getUiUpdater().updateUi();
+
+      for(var i=0; i < ShadowAnnotationsRegister.getAdditionalUiUpdaters().length; i++) {
+        ShadowAnnotationsRegister.getAdditionalUiUpdaters()[i].updateUi();
+      }
     },
 
     //
@@ -91,7 +95,10 @@ var ShadowAnnotations = (function () {
       return ShadowAnnotationsRegister.addProcessor(processor);
     },
     setUiUpdater : function (updater) {
-      ShadowAnnotationsRegister.setUiUpdater(processor);
+      ShadowAnnotationsRegister.setUiUpdater(updater);
+    },
+    addAdditionalUiUpdater : function (updater) {
+      ShadowAnnotationsRegister.addAdditionalUiUpdater(updater);
     },
     /*getUiUpdater : function (updater) {
      ShadowAnnotationsRegister.getUiUpdater();
@@ -278,7 +285,7 @@ var ReflectionUtils = (function () {
       }
 
       if(arguments.length) {
-        console.log('set '+name+' call '+newValue);
+        //console.log('set '+name+' call '+newValue);
         //console.log(shadowObj);
         if(oldValue!==newValue) {
           //console.log('fire value change event if needed '+oldValue+' !== '+newValue);
@@ -288,7 +295,8 @@ var ReflectionUtils = (function () {
 
             processAnnotations(rootObj, path ? path+'.'+name: name);
 
-            ShadowAnnotationsRegister.getUiUpdater().updateUi();
+            ShadowAnnotations.updateUi();
+
           }
         }
       }
@@ -467,6 +475,9 @@ var ShadowAnnotationsRegister = (function () {
   'use strict';
 
   var uiUpdater = null;
+  var additionalUiUpdaters = [];
+
+
   var converters = {};
   var validators = {};
   var processors = {};
@@ -506,6 +517,19 @@ var ShadowAnnotationsRegister = (function () {
     return obj;
   };
 
+  var addAdditionalUiUpdater = function (uiUpdater) {
+    additionalUiUpdaters.push(uiUpdater);
+  };
+
+  var getShadowObject = function (obj) {
+
+    if(obj) {
+      return obj[ShadowAnnotationsConstants.key] ? shadowObjects[obj[ShadowAnnotationsConstants.key]] : obj;
+    }
+    return obj;
+  };
+
+
   return {
     addValidator : function (validator) {
       //console.log('Adding validator for annotation '+validator.getAnnotationName());
@@ -540,8 +564,14 @@ var ShadowAnnotationsRegister = (function () {
     setUiUpdater : function (updater) {
       uiUpdater = updater;
     },
-    getUiUpdater : function (updater) {
+    getUiUpdater : function () {
       return uiUpdater
+    },
+    addAdditionalUiUpdater : function (updater) {
+      addAdditionalUiUpdater(updater)
+    },
+    getAdditionalUiUpdaters : function () {
+      return additionalUiUpdaters;
     },
   };
 }());
