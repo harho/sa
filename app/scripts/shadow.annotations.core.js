@@ -207,7 +207,7 @@ var ValidationWarnings = (function () {
   return {
     addWarning : function (validationWarning) {
 
-      for (var i = 0; i < errors.length; i++) {
+      for (var i = 0; i < warnings.length; i++) {
         if(warnings[i].property === validationWarning.property && warnings[i].warningKey === validationWarning.warningKey) {
           return;
         }
@@ -215,9 +215,9 @@ var ValidationWarnings = (function () {
 
       warnings.push(validationWarning);
     },
-    removeWarnings: function(property, warningKey) {
+    removeWarning: function(property, warningKey) {
 
-      for (var i = 0; i < errors.length; i++) {
+      for (var i = 0; i < warnings.length; i++) {
         if(warnings[i].property === property && warnings[i].warningKey === warningKey) {
           warnings.splice(i,1);
         }

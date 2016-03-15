@@ -30,7 +30,47 @@ var CityParamsValidator = (function () {
   };
 }());
 
+
 ShadowAnnotationsRegister.addValidator(CityParamsValidator);
+
+
+var NoteValidator = (function () {
+  'use strict';
+
+  var annotationName = 'noteValidation';
+
+  var doValidation = function (sa, property, obj) {
+
+    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+
+
+    if(propertyValue==='' || propertyValue===null) {
+
+      ValidationWarnings.addWarning({ property: property, warningKey: annotationName, objectKey: obj[ShadowAnnotationsConstants.key] });
+
+    }
+    else {
+
+      ValidationWarnings.removeWarning(property, annotationName);
+    }
+  };
+
+  return {
+    doValidation : function (sa, property, obj) {
+      return doValidation(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+
+ShadowAnnotationsRegister.addValidator(NoteValidator);
+
+
+
 
 var UiUpdater = (function () {
   'use strict';
@@ -38,28 +78,41 @@ var UiUpdater = (function () {
   function updateUi() {
 
     var validationErrors = ValidationErrors.getErrors();
+    var validationWarnings = ValidationWarnings.getWarnings();
 
     var bindings = DataBindingContext.getBindings();
 
     if(validationErrors.length>0) {
       var errorsPerPath = {};
+      var warningsPerPath = {};
       //console.log(errorsPerPath);
       //console.log('validationErrors.length: '+validationErrors.length);
 
       for (var i = 0; i < validationErrors.length; i++) {
 
         if(errorsPerPath[validationErrors[i].property]) {
-          errorsPerPath[validationErrors[i].property].errorMessage += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
+          errorsPerPath[validationErrors[i].property].message += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
         }
         else {
-          errorsPerPath[validationErrors[i].property] = {property: validationErrors[i].property, errorMessage: validationErrors[i].property+' '+validationErrors[i].errorKey };
+          errorsPerPath[validationErrors[i].property] = {property: validationErrors[i].property, message: validationErrors[i].property+' '+validationErrors[i].errorKey };
           errorsPerPath[validationErrors[i].property].objectKey = validationErrors[i].objectKey;
+        }
+      }
+
+      for (var i = 0; i < validationWarnings.length; i++) {
+
+        if(warningsPerPath[validationWarnings[i].property]) {
+          warningsPerPath[validationWarnings[i].property].message += ' '+validationWarnings[i].property+' '+validationWarnings[i].errorKey;
+        }
+        else {
+          warningsPerPath[validationWarnings[i].property] = {property: validationWarnings[i].property, message: validationWarnings[i].property+' '+validationWarnings[i].errorKey };
+          warningsPerPath[validationWarnings[i].property].objectKey = validationWarnings[i].objectKey;
         }
       }
 
       removeTooltipAttributes(bindings);
 
-      addTooltipAttributes(bindings, errorsPerPath);
+      addTooltipAttributes(bindings, errorsPerPath, warningsPerPath);
 
 
       $(function () {
@@ -72,11 +125,9 @@ var UiUpdater = (function () {
     }
   }
 
-  function addTooltipAttributes(bindings, errorsPerPath) {
+  function addTooltipAttributes(bindings, errorsPerPath, warningsPerPath) {
 
     for (var i in errorsPerPath ) {
-
-      //console.log(errorsPerPath[i].objectKey);
 
       var uiControl  = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property];
 
@@ -86,12 +137,38 @@ var UiUpdater = (function () {
 
         formControlDiv.className = 'form-group has-error';
 
-        formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
+        formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].message);
         formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
         formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
 
       }
     }
+
+    for (var i in warningsPerPath ) {
+
+      var uiControl  = bindings[warningsPerPath[i].objectKey+'.'+warningsPerPath[i].property];
+
+      if(uiControl) {
+
+        var formControlDiv = uiControl.parentNode.parentNode;
+
+        formControlDiv.className = errorsPerPath[i] ? 'form-group has-error' : 'from-group has-warning';
+
+
+        if(formControlDiv.childNodes[1].getAttribute('data-original-title')) {
+          formControlDiv.childNodes[1].setAttribute('data-original-title', formControlDiv.childNodes[1].getAttribute('data-original-title')+' '+warningsPerPath[i].message);
+        }
+        else {
+          formControlDiv.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
+        }
+
+        formControlDiv.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
+        formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
+        formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+
+      }
+    }
+
   }
 
   function removeTooltipAttributes(bindings) {
@@ -131,14 +208,20 @@ var AdditionalUiUpdater = (function () {
   function updateUi() {
 
     var validationErrors = ValidationErrors.getErrors();
+    var validationWarnings = ValidationWarnings.getWarnings();
 
     var bindings = DataBindingContext.getBindings();
 
-    if(validationErrors.length>0) {
+    if(validationErrors.length>0 || validationWarnings.length>0) {
+
       var errorsContent = '';
 
       for (var i = 0; i < validationErrors.length; i++) {
-        errorsContent +=validationErrors[i].property+' '+validationErrors[i].errorKey+'<br/>';
+        errorsContent += validationErrors[i].property + ' ' + validationErrors[i].errorKey + '<br/>';
+      }
+
+      for (var i = 0; i < validationWarnings.length; i++) {
+        errorsContent += validationWarnings[i].property + ' ' + validationWarnings[i].warningKey + '<br/>';
       }
 
       document.getElementById('all-errors').setAttribute('data-content', errorsContent);

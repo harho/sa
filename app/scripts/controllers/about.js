@@ -96,6 +96,10 @@ angular.module('test1App')
 
     $scope.validationErrors = ValidationErrors.getErrors();
 
+    $scope.errorsAndWarningsCount = function () {
+      return ValidationErrors.getErrors().length + ValidationWarnings.getWarnings().length;
+    }
+
     var data = {
 
     }
@@ -140,7 +144,7 @@ angular.module('test1App')
 
             sa$note: { beanValidation: {} },
             note: {
-                sa$value : { notEmptyValidation: {} },
+                sa$value : { noteValidation: {} },
                 sa$number1: { notEmptyValidation: {}, calculation: {}, bigConversion : {}  },
                 sa$number2: { notEmptyValidation: {}, calculation: {}, bigConversion : {}  },
             },
