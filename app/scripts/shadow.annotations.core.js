@@ -30,6 +30,9 @@ var ShadowAnnotations = (function () {
 
     doValidation : function (obj) {
       BeanValidator.doValidation(null, null, obj);
+      if(ShadowAnnotationsRegister.getGlobalValidator()) {
+        ShadowAnnotationsRegister.getGlobalValidator().doValidation(null, null, obj);
+      }
     },
 
     //
@@ -68,7 +71,10 @@ var ShadowAnnotations = (function () {
     // ShadowAnnotationsRegister methods
     //
     addValidator : function (validator) {
-      return ShadowAnnotationsRegister.addValidator(validator.getAnnotationName(), validator);
+      return ShadowAnnotationsRegister.addValidator(validator);
+    },
+    setGlobalValidator : function (validator) {
+      return ShadowAnnotationsRegister.setGlobalValidator(validator);
     },
     /*getValidator : function (annotationName) {
      return ShadowAnnotationsRegister.getValidator(annotationName);
@@ -194,6 +200,39 @@ var ValidationErrors = (function () {
   };
 }());
 
+var ValidationWarnings = (function () {
+  'use strict';
+  var warnings = [];
+
+  return {
+    addWarning : function (validationWarning) {
+
+      for (var i = 0; i < errors.length; i++) {
+        if(warnings[i].property === validationWarning.property && warnings[i].warningKey === validationWarning.warningKey) {
+          return;
+        }
+      }
+
+      warnings.push(validationWarning);
+    },
+    removeWarnings: function(property, warningKey) {
+
+      for (var i = 0; i < errors.length; i++) {
+        if(warnings[i].property === property && warnings[i].warningKey === warningKey) {
+          warnings.splice(i,1);
+        }
+      }
+    },
+    getWarnings: function() {
+      return warnings;
+    },
+    removeAllWarnings: function() {
+      warnings.length = 0;
+    },
+
+  };
+}());
+
 
 
 var ReflectionUtils = (function () {
@@ -294,6 +333,10 @@ var ReflectionUtils = (function () {
             //console.log('we got shadow annotation here: '+JSON.stringify(obj['sa$'+name]));
 
             processAnnotations(rootObj, path ? path+'.'+name: name);
+
+            if(ShadowAnnotationsRegister.getGlobalValidator()) {
+                ShadowAnnotationsRegister.getGlobalValidator().doValidation(null, null, rootObj);
+            }
 
             ShadowAnnotations.updateUi();
 
@@ -480,6 +523,7 @@ var ShadowAnnotationsRegister = (function () {
 
   var converters = {};
   var validators = {};
+  var globalValidator = null;
   var processors = {};
   var shadowObjects = {};
 
@@ -572,6 +616,12 @@ var ShadowAnnotationsRegister = (function () {
     },
     getAdditionalUiUpdaters : function () {
       return additionalUiUpdaters;
+    },
+    setGlobalValidator : function (validator) {
+      globalValidator = validator;
+    },
+    getGlobalValidator : function () {
+      return globalValidator;
     },
   };
 }());

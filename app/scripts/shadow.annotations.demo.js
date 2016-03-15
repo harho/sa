@@ -78,26 +78,40 @@ var UiUpdater = (function () {
 
       //console.log(errorsPerPath[i].objectKey);
 
-      var formControlDiv = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property].parentNode.parentNode;
-      formControlDiv.className='form-group has-error';
+      var uiControl  = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property];
 
-      formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
-      formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
-      formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+      if(uiControl) {
 
+        var formControlDiv = uiControl.parentNode.parentNode;
+
+        formControlDiv.className = 'form-group has-error';
+
+        formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].errorMessage);
+        formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
+        formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+
+      }
     }
   }
 
   function removeTooltipAttributes(bindings) {
+
     for (var i in bindings ) {
 
-      var formControlDiv = bindings[i].parentNode.parentNode;
 
-      formControlDiv.className='form-group';
+      var uiControl  = bindings[i];
 
-      formControlDiv.childNodes[1].removeAttribute('data-original-title');
-      formControlDiv.childNodes[1].removeAttribute('data-placement');
-      formControlDiv.childNodes[1].removeAttribute('data-toggle');
+      if(uiControl) {
+
+        var formControlDiv = uiControl.parentNode.parentNode;
+
+        formControlDiv.className = 'form-group';
+
+        formControlDiv.childNodes[1].removeAttribute('data-original-title');
+        formControlDiv.childNodes[1].removeAttribute('data-placement');
+        formControlDiv.childNodes[1].removeAttribute('data-toggle');
+
+      }
     }
   }
 
@@ -185,3 +199,34 @@ var Calculation = (function () {
 }());
 
 ShadowAnnotationsRegister.addProcessor(Calculation);
+
+
+var GlobalValidator = (function () {
+  'use strict';
+
+  var annotationName = 'globalValidation';
+
+  var doValidation = function (sa, property, obj) {
+
+    var totalValue = obj.value1 + obj.value2;
+
+    if(totalValue > 9007199254740900) {
+      ValidationErrors.addError({ property: 'error.validation.maximum.limit', errorKey: 'error.validation.maximum.limit', objectKey: obj[ShadowAnnotationsConstants.key] });
+    }
+    else {
+      ValidationErrors.removeError('error.validation.maximum.limit', 'error.validation.maximum.limit');
+    }
+  };
+
+  return {
+    doValidation : function (sa, property, obj) {
+      return doValidation(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+ShadowAnnotationsRegister.setGlobalValidator(GlobalValidator);
