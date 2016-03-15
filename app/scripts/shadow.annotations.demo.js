@@ -141,6 +141,8 @@ var UiUpdater = (function () {
         formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
         formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
 
+        //formControlDiv.childNodes[1].tooltip();
+
       }
     }
 
@@ -175,7 +177,6 @@ var UiUpdater = (function () {
 
     for (var i in bindings ) {
 
-
       var uiControl  = bindings[i];
 
       if(uiControl) {
@@ -192,10 +193,65 @@ var UiUpdater = (function () {
     }
   }
 
+  function updateControlUi (propertyPath) {
+
+    var bindings = DataBindingContext.getBindings();
+    var validationErrors = ValidationErrors.getErrors();
+    var validationWarnings = ValidationWarnings.getWarnings();
+    var errorsAndWarnings = false;
+
+    var errorsPerPath = {};
+    var warningsPerPath = {};
+
+    for (var i = 0; i < validationErrors.length; i++) {
+
+        if(propertyPath.endsWith(validationErrors[i].property)) {
+
+          errorsAndWarnings = true;
+
+          if(errorsPerPath[validationErrors[i].property]) {
+              errorsPerPath[validationErrors[i].property].message += ' '+validationErrors[i].property+' '+validationErrors[i].errorKey;
+          }
+          else {
+              errorsPerPath[validationErrors[i].property] = {property: validationErrors[i].property, message: validationErrors[i].property+' '+validationErrors[i].errorKey };
+              errorsPerPath[validationErrors[i].property].objectKey = validationErrors[i].objectKey;
+          }
+        }
+    }
+    for (var i = 0; i < validationWarnings.length; i++) {
+
+        if(propertyPath.endsWith(validationWarnings[i].property)) {
+
+        errorsAndWarnings = true;
+
+        if(warningsPerPath[validationWarnings[i].property]) {
+          warningsPerPath[validationWarnings[i].property].message += ' '+validationWarnings[i].property+' '+validationWarnings[i].warningKey;
+        }
+        else {
+          warningsPerPath[validationWarnings[i].property] = {property: validationWarnings[i].property, message: validationWarnings[i].property+' '+validationWarnings[i].warningKey };
+          warningsPerPath[validationWarnings[i].property].objectKey = validationWarnings[i].objectKey;
+        }
+      }
+    }
+
+
+    if(errorsAndWarnings) {
+      addTooltipAttributes(bindings, errorsPerPath, warningsPerPath);
+     $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+    }
+
+  }
+
   return {
     updateUi : function () {
       updateUi();
     },
+    updateControlUi: function(propertyPath) {
+      console.log('updating ....'+propertyPath);
+      updateControlUi(propertyPath);
+    }
   };
 }());
 

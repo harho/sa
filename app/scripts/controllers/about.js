@@ -87,7 +87,10 @@ angular.module('test1App')
         restrict: 'A', // only activate on element attribute
         require:  ['ngModel', '^?form', '^?ngModelOptions'], // get a hold of NgModelController
         link: function (scope, element, attrs, ngModel) {
-            DataBindingContext.addBinding(attrs.ngModel.replace('sg_',''), element[0]);
+            var propertyPath = attrs.ngModel.replace('sg_','');
+            console.log('linking ....'+propertyPath);
+            DataBindingContext.addBinding(propertyPath, element[0]);
+            ShadowAnnotationsRegister.getUiUpdater().updateControlUi(propertyPath);
         }
     }
   })
@@ -173,7 +176,7 @@ angular.module('test1App')
 
     $scope.enableEdit = enableEdit;
 
-    var editMode = false;
+    var editMode = true;
 
     function enableEdit() {
         var bindings = DataBindingContext.getBindings();
@@ -208,18 +211,24 @@ angular.module('test1App')
 
             DataBindingContext.enable();
             ShadowAnnotations.doValidation(user);
-            ShadowAnnotations.updateUi();
+            //ShadowAnnotations.updateUi();
             fireValidationCalled = true;
         }
         else {
             DataBindingContext.disable();
             ValidationErrors.removeAllErrors();
-            ShadowAnnotations.updateUi();
+            //ShadowAnnotations.updateUi();
         }
 
 
         editMode = !editMode;
     }
+
+    DataBindingContext.enable();
+    ShadowAnnotations.doValidation(user);
+
+
+
 
     $scope.convertFrom = convertFrom;
 
