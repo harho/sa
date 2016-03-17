@@ -65,6 +65,12 @@ var ShadowAnnotations = (function () {
         ReflectionUtils.createSettersGetters(obj);
       }
     },
+    setDefaultParentElementLevel : function(level) {
+      DataBindingContext.setDefaultParentElementLevel(level);
+    },
+    getDefaultParentElementLevel : function() {
+      return DataBindingContext.getDefaultParentElementLevel();
+    },
 
 
     //
