@@ -88,7 +88,8 @@ angular.module('test1App')
         require:  ['ngModel', '^?form', '^?ngModelOptions'], // get a hold of NgModelController
         link: function (scope, element, attrs, ngModel) {
             var propertyPath = attrs.ngModel.replace('sg_','');
-            console.log('linking ....'+propertyPath);
+
+
             DataBindingContext.addBinding(propertyPath, element[0]);
             ShadowAnnotationsRegister.getUiUpdater().updateControlUi(propertyPath);
         }
@@ -185,24 +186,20 @@ angular.module('test1App')
 
             if(!editMode) {
 
-                if(bindings[i].getAttribute('type')=='checkbox') {
-                    bindings[i].removeAttribute('disabled');
+                if(bindings[i].element.getAttribute('type')=='checkbox') {
+                    bindings[i].element.removeAttribute('disabled');
                 }
                 else {
-                    bindings[i].removeAttribute('readonly');
+                    bindings[i].element.removeAttribute('readonly');
                 }
-
             }
             else {
-                console.log(bindings[i].getAttribute('type'));
-                if(bindings[i].getAttribute('type')=='checkbox') {
-                    bindings[i].setAttribute('disabled',true);
+                if(bindings[i].element.getAttribute('type')=='checkbox') {
+                    bindings[i].element.setAttribute('disabled',true);
                 }
                 else {
-                    bindings[i].setAttribute('readonly',true);
+                    bindings[i].element.setAttribute('readonly',true);
                 }
-
-
             }
 
         }

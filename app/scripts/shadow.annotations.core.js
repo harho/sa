@@ -120,18 +120,20 @@ var ShadowAnnotationsConstants = (function () {
   return {
     prefix : 'sa$',
     key : 'sa$sa',
-    setGetPrefix : 'sg_'
+    setGetPrefix : 'sg_',
   };
 }());
 
 var DataBindingContext = (function () {
   'use strict';
 
+  var defaultParentElementLevel = 2;
+
   var bindings = {};
   var enabled = false;
 
-  var addBinding = function (property, element) {
-    bindings[property] = element;
+  var addBinding = function (property, element, parentElementLevel) {
+    bindings[property] = { element: element, parentElementLevel: parentElementLevel ? parentElementLevel : defaultParentElementLevel } ;
 
   };
 
@@ -144,8 +146,8 @@ var DataBindingContext = (function () {
   };
 
   return {
-    addBinding : function (property, element) {
-      return addBinding(property, element);
+    addBinding : function (property, element, parentElementLevel) {
+      return addBinding(property, element, parentElementLevel);
     },
     getBindings : function () {
       return bindings;
@@ -162,6 +164,12 @@ var DataBindingContext = (function () {
     bind : function (key, obj, shadowObj) {
       bind(key, obj, shadowObj);
     },
+    setDefaultParentElementLevel : function(level) {
+      defaultParentElementLevel = level;
+    },
+    getDefaultParentElementLevel : function() {
+      return defaultParentElementLevel;
+    }
 
   };
 }());

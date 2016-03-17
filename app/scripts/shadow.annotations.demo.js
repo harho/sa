@@ -125,21 +125,37 @@ var UiUpdater = (function () {
     }
   }
 
+  function getParentElement(binding) {
+      return findParentElement(binding.element, binding.parentElementLevel);
+
+  }
+  function findParentElement(element, level) {
+    console.log(level);
+    if(level == 1) {
+      return element.parentNode;
+    }
+    else {
+      return findParentElement(element.parentNode, level-1);
+    }
+
+  }
+
+
   function addTooltipAttributes(bindings, errorsPerPath, warningsPerPath) {
 
     for (var i in errorsPerPath ) {
 
-      var uiControl  = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property];
+      var binding  = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property];
 
-      if(uiControl) {
+      if(binding) {
 
-        var formControlDiv = uiControl.parentNode.parentNode;
+        var parentElement = getParentElement(binding);
 
-        formControlDiv.className = 'form-group has-error';
+        parentElement.className = 'form-group has-error';
 
-        formControlDiv.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].message);
-        formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
-        formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+        parentElement.childNodes[1].setAttribute('data-original-title', errorsPerPath[i].message);
+        parentElement.childNodes[1].setAttribute('data-placement', 'top');
+        parentElement.childNodes[1].setAttribute('data-toggle', 'tooltip');
 
         //formControlDiv.childNodes[1].tooltip();
 
@@ -148,25 +164,25 @@ var UiUpdater = (function () {
 
     for (var i in warningsPerPath ) {
 
-      var uiControl  = bindings[warningsPerPath[i].objectKey+'.'+warningsPerPath[i].property];
+      var binding  = bindings[warningsPerPath[i].objectKey+'.'+warningsPerPath[i].property];
 
-      if(uiControl) {
+      if(binding) {
 
-        var formControlDiv = uiControl.parentNode.parentNode;
+        var parentElement = getParentElement(binding);
 
-        formControlDiv.className = errorsPerPath[i] ? 'form-group has-error' : 'from-group has-warning';
+        parentElement.className = errorsPerPath[i] ? 'form-group has-error' : 'from-group has-warning';
 
 
-        if(formControlDiv.childNodes[1].getAttribute('data-original-title')) {
-          formControlDiv.childNodes[1].setAttribute('data-original-title', formControlDiv.childNodes[1].getAttribute('data-original-title')+' '+warningsPerPath[i].message);
+        if(parentElement.childNodes[1].getAttribute('data-original-title')) {
+          parentElement.childNodes[1].setAttribute('data-original-title', parentElement.childNodes[1].getAttribute('data-original-title')+' '+warningsPerPath[i].message);
         }
         else {
-          formControlDiv.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
+          parentElement.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
         }
 
-        formControlDiv.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
-        formControlDiv.childNodes[1].setAttribute('data-placement', 'top');
-        formControlDiv.childNodes[1].setAttribute('data-toggle', 'tooltip');
+        parentElement.childNodes[1].setAttribute('data-original-title', warningsPerPath[i].message);
+        parentElement.childNodes[1].setAttribute('data-placement', 'top');
+        parentElement.childNodes[1].setAttribute('data-toggle', 'tooltip');
 
       }
     }
@@ -177,17 +193,17 @@ var UiUpdater = (function () {
 
     for (var i in bindings ) {
 
-      var uiControl  = bindings[i];
+      var binding  = bindings[i];
 
-      if(uiControl) {
+      if(binding) {
 
-        var formControlDiv = uiControl.parentNode.parentNode;
+        var parentElement = getParentElement(binding);
 
-        formControlDiv.className = 'form-group';
+        parentElement.className = 'form-group';
 
-        formControlDiv.childNodes[1].removeAttribute('data-original-title');
-        formControlDiv.childNodes[1].removeAttribute('data-placement');
-        formControlDiv.childNodes[1].removeAttribute('data-toggle');
+        parentElement.childNodes[1].removeAttribute('data-original-title');
+        parentElement.childNodes[1].removeAttribute('data-placement');
+        parentElement.childNodes[1].removeAttribute('data-toggle');
 
       }
     }
@@ -249,7 +265,7 @@ var UiUpdater = (function () {
       updateUi();
     },
     updateControlUi: function(propertyPath) {
-      console.log('updating ....'+propertyPath);
+
       updateControlUi(propertyPath);
     }
   };
@@ -265,8 +281,6 @@ var AdditionalUiUpdater = (function () {
 
     var validationErrors = ValidationErrors.getErrors();
     var validationWarnings = ValidationWarnings.getWarnings();
-
-    var bindings = DataBindingContext.getBindings();
 
     if(validationErrors.length>0 || validationWarnings.length>0) {
 
