@@ -72,6 +72,9 @@ var ShadowAnnotations = (function () {
     getDefaultParentElementLevel : function() {
       return DataBindingContext.getDefaultParentElementLevel();
     },
+    getBindedProperties: function() {
+      return DataBindingContext.getBindedProperties();
+    },
 
 
     //
@@ -156,6 +159,16 @@ var DataBindingContext = (function () {
 
   };
 
+  var getBindedProperties = function() {
+    var bindedProperties = [];
+    for ( var i in bindings ) {
+      bindedProperties.push(i);
+    }
+    return bindedProperties;
+  };
+
+
+
   var bind = function (key, obj, shadowObj) {
 
     if(obj) {
@@ -191,7 +204,11 @@ var DataBindingContext = (function () {
     },
     removeAllBindigs: function() {
       bindings = {};
+    },
+    getBindedProperties: function() {
+      return getBindedProperties();
     }
+
 
   };
 }());
