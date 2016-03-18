@@ -13,6 +13,7 @@ var ShadowAnnotations = (function () {
   'use strict';
 
   return {
+
     //
     // UiUpdater
     //
@@ -115,6 +116,18 @@ var ShadowAnnotations = (function () {
     /*getUiUpdater : function (updater) {
      ShadowAnnotationsRegister.getUiUpdater();
      },*/
+
+    //
+    // ValidationError methods
+    //
+    containsAnyError: function (properties) {
+      return ValidationErrors.containsAnyError(properties);
+    },
+    getErrors: function () {
+      return ValidationErrors.getErrors();
+    }
+
+
   };
 
 }());
@@ -175,6 +188,9 @@ var DataBindingContext = (function () {
     },
     getDefaultParentElementLevel : function() {
       return defaultParentElementLevel;
+    },
+    removeAllBindigs: function() {
+      bindings = {};
     }
 
   };
@@ -183,6 +199,21 @@ var DataBindingContext = (function () {
 var ValidationErrors = (function () {
   'use strict';
   var errors = [];
+
+  var containsAnyError =  function (properties) {
+
+      for(var i = 0; i< errors.length ; i++) {
+        for(var j = 0; j < properties.length; j++) {
+
+           if(errors[i].property === properties[j]) {
+              return true;
+           }
+        }
+
+      }
+      return false;
+
+  };
 
   return {
     addError : function (validationError) {
@@ -210,6 +241,9 @@ var ValidationErrors = (function () {
     removeAllErrors: function() {
       errors.length = 0;
     },
+    containsAnyError: function(properties) {
+      return containsAnyError(properties)
+    }
 
   };
 }());
@@ -844,4 +878,3 @@ var BigConverter = (function () {
 }());
 
 ShadowAnnotationsRegister.addConverter(BigConverter);
-
