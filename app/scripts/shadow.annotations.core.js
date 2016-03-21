@@ -159,10 +159,21 @@ var DataBindingContext = (function () {
 
   };
 
-  var getBindedProperties = function() {
+  var getAllBindedProperties = function() {
     var bindedProperties = [];
     for ( var i in bindings ) {
       bindedProperties.push(i);
+    }
+    return bindedProperties;
+  };
+
+  var getBindedProperties = function(obj) {
+    var bindedProperties = [];
+    for ( var i in bindings ) {
+
+      if(i.indexOf(obj[ShadowAnnotationsConstants.key])===0) {
+        bindedProperties.push(i);
+      }
     }
     return bindedProperties;
   };
@@ -205,8 +216,20 @@ var DataBindingContext = (function () {
     removeAllBindigs: function() {
       bindings = {};
     },
-    getBindedProperties: function() {
-      return getBindedProperties();
+    removeBindigs: function(obj) {
+
+      for (var i = 0; i < bindings.length; i++) {
+        if(bindings[i].property.indexOf(obj[ShadowAnnotationsConstants.key])===0) {
+          bindings.splice(i,1);
+        }
+      }
+
+    },
+    getAllBindedProperties: function() {
+      return getAllBindedProperties();
+    },
+    getBindedProperties: function(obj) {
+      return getBindedProperties(obj);
     }
 
 
@@ -219,16 +242,16 @@ var ValidationErrors = (function () {
 
   var containsAnyError =  function (properties) {
 
-      for(var i = 0; i< errors.length ; i++) {
-        for(var j = 0; j < properties.length; j++) {
+    for(var i = 0; i< errors.length ; i++) {
+      for(var j = 0; j < properties.length; j++) {
 
-           if(errors[i].property === properties[j]) {
-              return true;
-           }
+        if(errors[i].property === properties[j]) {
+          return true;
         }
-
       }
-      return false;
+
+    }
+    return false;
 
   };
 
@@ -400,7 +423,7 @@ var ReflectionUtils = (function () {
             processAnnotations(rootObj, path ? path+'.'+name: name);
 
             if(ShadowAnnotationsRegister.getGlobalValidator()) {
-                ShadowAnnotationsRegister.getGlobalValidator().doValidation(null, null, rootObj);
+              ShadowAnnotationsRegister.getGlobalValidator().doValidation(null, null, rootObj);
             }
 
             ShadowAnnotations.updateUi();
