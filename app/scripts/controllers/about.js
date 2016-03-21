@@ -225,8 +225,6 @@ angular.module('test1App')
     ShadowAnnotations.doValidation(user);
 
 
-
-
     $scope.convertFrom = convertFrom;
 
     function convertFrom() {
@@ -234,6 +232,5 @@ angular.module('test1App')
          $scope.data.userClone = ReflectionUtils.convertFrom(ReflectionUtils.cloneObject(user));
 
     }
-
 
   });

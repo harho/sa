@@ -72,8 +72,14 @@ var ShadowAnnotations = (function () {
     getDefaultParentElementLevel : function() {
       return DataBindingContext.getDefaultParentElementLevel();
     },
-    getBindedProperties: function() {
-      return DataBindingContext.getBindedProperties();
+    getBindedProperties: function(key) {
+      return DataBindingContext.getBindedProperties(key);
+    },
+    getBindedPropertiesWithoutKey: function(key) {
+      return DataBindingContext.getBindedPropertiesWithoutKey(key);
+    },
+    removeAllBindigs: function() {
+      DataBindingContext.removeAllBindigs();
     },
 
 
@@ -123,8 +129,8 @@ var ShadowAnnotations = (function () {
     //
     // ValidationError methods
     //
-    containsAnyError: function (properties) {
-      return ValidationErrors.containsAnyError(properties);
+    containsAnyError: function (properties, key) {
+      return ValidationErrors.containsAnyError(properties, key);
     },
     getErrors: function () {
       return ValidationErrors.getErrors();
@@ -167,12 +173,24 @@ var DataBindingContext = (function () {
     return bindedProperties;
   };
 
-  var getBindedProperties = function(obj) {
+  var getBindedProperties = function(key) {
     var bindedProperties = [];
     for ( var i in bindings ) {
 
-      if(i.indexOf(obj[ShadowAnnotationsConstants.key])===0) {
+      if(i.indexOf(key)===0) {
         bindedProperties.push(i);
+      }
+    }
+    return bindedProperties;
+  };
+
+  var getBindedPropertiesWithoutKey = function(key) {
+    var bindedProperties = [];
+
+    for ( var i in bindings ) {
+
+      if(i.indexOf(key)===0) {
+        bindedProperties.push(i.substring(key.length+1));
       }
     }
     return bindedProperties;
@@ -216,10 +234,10 @@ var DataBindingContext = (function () {
     removeAllBindigs: function() {
       bindings = {};
     },
-    removeBindigs: function(obj) {
+    removeBindigs: function(key) {
 
       for (var i = 0; i < bindings.length; i++) {
-        if(bindings[i].property.indexOf(obj[ShadowAnnotationsConstants.key])===0) {
+        if(bindings[i].property.indexOf(key)===0) {
           bindings.splice(i,1);
         }
       }
@@ -228,11 +246,12 @@ var DataBindingContext = (function () {
     getAllBindedProperties: function() {
       return getAllBindedProperties();
     },
-    getBindedProperties: function(obj) {
-      return getBindedProperties(obj);
+    getBindedProperties: function(key) {
+      return getBindedProperties(key);
+    },
+    getBindedPropertiesWithoutKey: function(key) {
+      return getBindedPropertiesWithoutKey(key);
     }
-
-
   };
 }());
 
@@ -240,16 +259,15 @@ var ValidationErrors = (function () {
   'use strict';
   var errors = [];
 
-  var containsAnyError =  function (properties) {
+  var containsAnyError =  function (properties, key) {
 
     for(var i = 0; i< errors.length ; i++) {
       for(var j = 0; j < properties.length; j++) {
 
-        if(errors[i].property === properties[j]) {
+        if(errors[i].property === properties[j] && errors[i].objectKey === key) {
           return true;
         }
       }
-
     }
     return false;
 
@@ -281,8 +299,8 @@ var ValidationErrors = (function () {
     removeAllErrors: function() {
       errors.length = 0;
     },
-    containsAnyError: function(properties) {
-      return containsAnyError(properties)
+    containsAnyError: function(properties, key) {
+      return containsAnyError(properties, key)
     }
 
   };
@@ -367,8 +385,6 @@ var ReflectionUtils = (function () {
         }
 
       }
-
-
     }
 
   }
