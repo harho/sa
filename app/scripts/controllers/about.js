@@ -160,6 +160,8 @@ angular.module('test1App')
     ShadowAnnotations.link('user', user, userShadow, true);
     $scope.user = user;
 
+    ShadowAnnotationsRegister.addGlobalValidator('user', GlobalValidator);
+
     var userClone = ReflectionUtils.cloneObject(user);
     ReflectionUtils.convertFrom(userClone);
     $scope.data.userClone = userClone;
@@ -177,14 +179,16 @@ angular.module('test1App')
 
     $scope.enableEdit = enableEdit;
 
-    var editMode = true;
+    var editMode = false;
 
     function enableEdit() {
         var bindings = DataBindingContext.getBindings();
 
+        editMode = !editMode;
+
         for(var i in bindings) {
 
-            if(!editMode) {
+            if(editMode) {
 
                 if(bindings[i].element.getAttribute('type')=='checkbox') {
                     bindings[i].element.removeAttribute('disabled');
@@ -204,25 +208,25 @@ angular.module('test1App')
 
         }
 
-        if(!editMode) {
+        if(editMode) {
 
             DataBindingContext.enable();
             ShadowAnnotations.doValidation(user);
-            //ShadowAnnotations.updateUi();
+            ShadowAnnotations.updateUi();
             fireValidationCalled = true;
         }
         else {
             DataBindingContext.disable();
             ValidationErrors.removeAllErrors();
-            //ShadowAnnotations.updateUi();
+            ShadowAnnotations.updateUi();
         }
 
 
-        editMode = !editMode;
+
     }
 
-    DataBindingContext.enable();
-    ShadowAnnotations.doValidation(user);
+    //DataBindingContext.enable();
+    //ShadowAnnotations.doValidation(user);
 
 
     $scope.convertFrom = convertFrom;

@@ -130,7 +130,6 @@ var UiUpdater = (function () {
 
   }
   function findParentElement(element, level) {
-    console.log(level);
     if(level == 1) {
       return element.parentNode;
     }
@@ -279,6 +278,8 @@ var AdditionalUiUpdater = (function () {
 
   function updateUi() {
 
+    console.log('Additional updateUi call ...');
+
     var validationErrors = ValidationErrors.getErrors();
     var validationWarnings = ValidationWarnings.getWarnings();
 
@@ -382,4 +383,3 @@ var GlobalValidator = (function () {
   };
 }());
 
-ShadowAnnotationsRegister.setGlobalValidator(GlobalValidator);
