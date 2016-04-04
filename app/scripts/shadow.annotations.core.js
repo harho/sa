@@ -18,11 +18,7 @@ var ShadowAnnotations = (function () {
     // UiUpdater
     //
     updateUi : function () {
-
-      console.log('--------------------->'+ ShadowAnnotationsRegister.getAdditionalUiUpdaters());
       ShadowAnnotationsRegister.getUiUpdater().updateUi();
-
-
 
       for(var i=0; i < ShadowAnnotationsRegister.getAdditionalUiUpdaters().length; i++) {
         ShadowAnnotationsRegister.getAdditionalUiUpdaters()[i].updateUi();
