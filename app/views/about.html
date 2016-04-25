@@ -57,7 +57,7 @@
                 </div>
             </div>
 
-             <div class="form-group">
+            <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">Street</label>
                 <div class="col-sm-10">
                     <input type="text" readonly sa-model sa-bind ng-model="user.address.street" class="form-control" id="street" name="street" placeholder="Enter Street">
@@ -87,10 +87,22 @@
                 </div>
             </div>
 
+
+          <div class="form-group" id="items">
+
+            <label for="items" class="col-sm-2 control-label">Items</label>
+
+            <div class="col-sm-10">
+              <ul>
+                <li ng-repeat="item in user.items">{{item.name}} ({{item.value}})</li>
+              </ul>
+            </div>
+          </div>
+
             <div class="form-group">
                 <label for="noteValue" class="col-sm-2 control-label">Note value</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sa-model sa-bind ng-model="user.address.note.value" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                    <input type="text" readonly sa-model sa-bind ng-model="user.address.note.value" class="form-control" placeholder="Enter Value2">
                 </div>
             </div>
 
@@ -100,6 +112,7 @@
     </div>
 
 
+
     <!--Name: <input type="text" sa-bind ng-model="user.name"/><br/>-->
     <!--Name: <input type="text" sa-bind ng-model="user.sg_name" ng-model-options="{ getterSetter: true }" /><br/>-->
     <!--Value1: <input type="text" sa-bind ng-model="user.value1"  /><br/>-->
@@ -107,6 +120,9 @@
     <!--Number1: <input type="text" sa-bind ng-model="user.sg_number1" ng-model-options="{ getterSetter: true }" /><br/>-->
     <!--Number2: <input type="text" sa-bind ng-model="user.sg_number2" ng-model-options="{ getterSetter: true }" /><br/>-->
 </div>
+
+
+<br/>
 
 <div>User: <b>{{user|json}}</b></div></br>
 <div>User clone: <b>{{data.userClone|json}}</b></div>

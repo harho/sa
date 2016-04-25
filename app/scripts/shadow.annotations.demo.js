@@ -30,8 +30,36 @@ var CityParamsValidator = (function () {
   };
 }());
 
+var ItemsValidator = (function () {
+  'use strict';
 
-ShadowAnnotationsRegister.addValidator(CityParamsValidator);
+  var annotationName = 'itemsValidation';
+
+  var doValidation = function (sa, property, obj) {
+
+    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+
+    if(propertyValue.length<2) {
+      ValidationErrors.addError({ property: property, errorKey: 'error.'+annotationName, objectKey: obj[ShadowAnnotationsConstants.key] });
+    }
+    else {
+      ValidationErrors.removeError(property, annotationName);
+    }
+  };
+
+  return {
+    doValidation : function (sa, property, obj) {
+      return doValidation(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+
+ShadowAnnotationsRegister.addValidator(ItemsValidator);
 
 
 var NoteValidator = (function () {
@@ -130,7 +158,7 @@ var UiUpdater = (function () {
 
   }
   function findParentElement(element, level) {
-    console.log(level);
+    //console.log(level);
     if(level == 1) {
       return element.parentNode;
     }
@@ -282,17 +310,30 @@ var AdditionalUiUpdater = (function () {
     var validationErrors = ValidationErrors.getErrors();
     var validationWarnings = ValidationWarnings.getWarnings();
 
+
+    var items = document.getElementById('items');
+
+    removeTooltipAttributes(items)
+
     if(validationErrors.length>0 || validationWarnings.length>0) {
 
       var errorsContent = '';
 
       for (var i = 0; i < validationErrors.length; i++) {
         errorsContent += validationErrors[i].property + ' ' + validationErrors[i].errorKey + '<br/>';
+
+        if(validationErrors[i].property=='items') {
+          addTooltipAttributes(items, validationErrors[i].property + ' ' + validationErrors[i].errorKey);
+        }
       }
 
       for (var i = 0; i < validationWarnings.length; i++) {
         errorsContent += validationWarnings[i].property + ' ' + validationWarnings[i].warningKey + '<br/>';
       }
+
+
+
+
 
       document.getElementById('all-errors').setAttribute('data-content', errorsContent);
 
@@ -302,10 +343,23 @@ var AdditionalUiUpdater = (function () {
 
     }
     else {
-
       document.getElementById('all-errors').removeAttribute('data-content');
     }
   }
+
+  function addTooltipAttributes(element, errorMessage) {
+    element.className = 'form-group has-error';
+    element.childNodes[1].setAttribute('data-original-title', errorMessage);
+    element.childNodes[1].setAttribute('data-placement', 'top');
+    element.childNodes[1].setAttribute('data-toggle', 'tooltip')
+  }
+
+  function removeTooltipAttributes(element) {
+    element.className = 'form-group';
+    element.removeAttribute('data-content');
+  }
+
+
 
 
   return {
@@ -382,4 +436,4 @@ var GlobalValidator = (function () {
   };
 }());
 
-ShadowAnnotationsRegister.setGlobalValidator(GlobalValidator);
+

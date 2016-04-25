@@ -129,6 +129,10 @@ angular.module('test1App')
             },
 
         },
+
+        items: [{name:'Item1', value:1}]
+
+
      };
 
     var userShadow = {
@@ -153,12 +157,16 @@ angular.module('test1App')
                 sa$number2: { notEmptyValidation: {}, calculation: {}, bigConversion : {}  },
             },
         },
+        sa$items: { itemsValidation:{}},
      };
 
     //ShadowAnnotationsRegister.addShadowObject(user.sa$sa, userShadow);
 
     ShadowAnnotations.link('user', user, userShadow, true);
     $scope.user = user;
+
+    ShadowAnnotationsRegister.addGlobalValidator('user',GlobalValidator);
+
 
     var userClone = ReflectionUtils.cloneObject(user);
     ReflectionUtils.convertFrom(userClone);
@@ -177,7 +185,7 @@ angular.module('test1App')
 
     $scope.enableEdit = enableEdit;
 
-    var editMode = true;
+    var editMode = false;
 
     function enableEdit() {
         var bindings = DataBindingContext.getBindings();
@@ -208,21 +216,22 @@ angular.module('test1App')
 
             DataBindingContext.enable();
             ShadowAnnotations.doValidation(user);
-            //ShadowAnnotations.updateUi();
+            ShadowAnnotations.updateUi();
             fireValidationCalled = true;
         }
         else {
             DataBindingContext.disable();
             ValidationErrors.removeAllErrors();
-            //ShadowAnnotations.updateUi();
+            ValidationWarnings.removeAllWarnings();
+            ShadowAnnotations.updateUi();
         }
 
 
         editMode = !editMode;
     }
 
-    DataBindingContext.enable();
-    ShadowAnnotations.doValidation(user);
+    //DataBindingContext.enable();
+    //ShadowAnnotations.doValidation(user);
 
 
     $scope.convertFrom = convertFrom;
