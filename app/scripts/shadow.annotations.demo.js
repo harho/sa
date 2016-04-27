@@ -1,3 +1,56 @@
+var ArrayConverter = (function () {
+  'use strict';
+
+  var annotationName = 'arrayConversion';
+
+  var to = function (sa, property, obj) {
+
+    var jsArray = ReflectionUtils.getPropertyValue(obj, property);
+
+    console.log('This property '+property+' should be an array.');
+    console.log(jsArray);
+
+    if(jsArray) {
+
+      var fns = ['push', 'pop', 'splice'];
+
+      for (var i in fns) { (function() {
+        var name = fns[i]
+        var fn = jsArray[name];
+
+        jsArray[name] = function() {
+          console.log('------------------->');
+          console.log(name + '()');
+          console.log(arguments);
+          var result = fn.apply(jsArray, arguments);
+          ArrayValidator.doValidation(null, property, obj)
+          ShadowAnnotations.updateUi();
+        }
+      })()}
+
+    }
+  };
+
+  var from = function (sa, property, obj) {
+  };
+
+  return {
+    to : function (sa, property, obj) {
+      return to(sa, property, obj);
+    },
+    from : function (sa, property, obj) {
+      return from(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+ShadowAnnotationsRegister.addConverter(ArrayConverter);
+
+
 var CityParamsValidator = (function () {
   'use strict';
 
@@ -313,7 +366,7 @@ var AdditionalUiUpdater = (function () {
 
     var items = document.getElementById('items');
 
-    removeTooltipAttributes(items)
+    removeTooltipAttributes([items]);
 
     if(validationErrors.length>0 || validationWarnings.length>0) {
 
@@ -324,16 +377,25 @@ var AdditionalUiUpdater = (function () {
 
         if(validationErrors[i].property=='items') {
           addTooltipAttributes(items, validationErrors[i].property + ' ' + validationErrors[i].errorKey);
+
+        }
+
+        if(!!~validationErrors[i].property.indexOf('items[')) {
+          var el = $('[id^="'+validationErrors[i].property.substring(0,validationErrors[i].property.indexOf(']')+1)+'"]')[0];
+          if(el) {
+              //addTooltipAttributes(el, validationErrors[i].property + ' ' + validationErrors[i].errorKey);
+
+              el.setAttribute('data-original-title', validationErrors[i].property + ' ' + validationErrors[i].errorKey);
+              el.setAttribute('data-placement', 'top');
+              el.setAttribute('data-toggle', 'tooltip')
+          }
+
         }
       }
 
       for (var i = 0; i < validationWarnings.length; i++) {
-        errorsContent += validationWarnings[i].property + ' ' + validationWarnings[i].warningKey + '<br/>';
+          errorsContent += validationWarnings[i].property + ' ' + validationWarnings[i].warningKey + '<br/>';
       }
-
-
-
-
 
       document.getElementById('all-errors').setAttribute('data-content', errorsContent);
 
@@ -354,9 +416,15 @@ var AdditionalUiUpdater = (function () {
     element.childNodes[1].setAttribute('data-toggle', 'tooltip')
   }
 
-  function removeTooltipAttributes(element) {
-    element.className = 'form-group';
-    element.removeAttribute('data-content');
+  function removeTooltipAttributes(elements) {
+
+    for(var i=0; i<elements.length;i++) {
+
+      elements[i].className = 'form-group';
+      elements[i].removeAttribute('data-content');
+
+
+    }
   }
 
 

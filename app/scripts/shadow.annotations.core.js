@@ -644,16 +644,29 @@ var ReflectionUtils = (function () {
 
   }
 
+  function getArrayIndex(value) {
+    console.log('getArrayIndex: '+value);
+    var index = value.substr(value.indexOf('[')+1, value.indexOf(']'));
+    console.log('Index: '+index);
+    return parseFloat(index);
+  }
+
   function getPropertyValue(obj, property) {
 
     if(obj && property) {
 
       if(!!~property.indexOf('.')) {
+
         var part1 = property.substr(0,property.indexOf('.'));
         var part2 = property.substr(property.indexOf('.')+1, property.length);
 
-        return getPropertyValue(obj[part1], part2);
-
+        if(!!~part1.indexOf('[')) {
+            console.log(part1.substr(0, property.indexOf('[')));
+            return getPropertyValue(obj[part1.substr(0, property.indexOf('['))][getArrayIndex(part1)], part2);
+        }
+        else {
+          return getPropertyValue(obj[part1], part2);
+        }
 
       }
       return obj[property];
@@ -959,6 +972,124 @@ var BeanValidator = (function () {
 }());
 
 ShadowAnnotationsRegister.addValidator(BeanValidator);
+
+
+var ArrayValidator = (function () {
+  'use strict';
+
+  var annotationName = 'arrayValidation';
+
+  var fixPropertyForShadowObject = function(property) {
+        var part1 = property.substring(0,property.indexOf('['));
+        var part2 = property.substring(property.indexOf(']')+1);
+        var result = part1+part2;
+
+        if(!!~result.indexOf('[')) {
+          return fixPropertyForShadowObject(result);
+        }
+        return result;
+  }
+
+  var doValidation = function (sa, property, obj) {
+
+    console.log('property:'+property);
+
+    var rootObj = obj;
+    var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(obj);
+    obj = property ? ReflectionUtils.getPropertyValue(obj, property): obj;
+    var shadowObj = property ? ReflectionUtils.getPropertyValue(rootShadowObj, fixPropertyForShadowObject(property)): rootShadowObj;
+
+    //var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+    // console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+    if(!obj) {
+      return;
+    }
+    for ( var k = 0; k < obj.length; k++ ) {
+
+      console.log('Array validation property: '+property);
+      console.log('Array validation: '+k);
+      console.log(obj[k]);
+      console.log(shadowObj);
+      //BeanValidator.doValidation(shadowObj, null,  obj[i]);
+
+      for ( var i in shadowObj ) {
+
+        console.log(i);
+
+        if(i.indexOf(ShadowAnnotationsConstants.prefix) > -1) {
+
+          var shadowAnnotations = shadowObj[i];
+
+          console.log('--> shadowAnnotations');
+          console.log(shadowAnnotations);
+
+          for ( var j in shadowAnnotations ) {
+
+            if(j.endsWith('Validation')) {
+
+              var validator = ShadowAnnotationsRegister.getValidator(j);
+
+              console.log('--> validator');
+              console.log(validator);
+              console.log(shadowAnnotations[j]);
+
+              if(validator) {
+                console.log('--> validator');
+                console.log(property? property+'['+k+'].'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''));
+
+                validator.doValidation(shadowAnnotations[j], property? property+'['+k+'].'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
+              }
+              else {
+                console.warn('Validator for annotation '+j+' not found');
+              }
+            }
+            else if(j.endsWith('Conversion')) {
+
+              //do nothing here
+
+              /*var converter = ShadowAnnotationsRegister.getConverter(j);
+               if(validator) {
+               converter.to(shadowAnnotations[j], property? property+'."+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
+               }
+               else {
+               console.warn('Converter for annotation '+j+' not found');
+               }*/
+
+            }
+            else {
+              // after all it must be a processor
+              var processor = ShadowAnnotationsRegister.getProcessor(j);
+              if(processor) {
+                processor.process(shadowAnnotations[j], property? property+'.'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
+              }
+              else {
+                console.warn('Processor for annotation '+j+' not found');
+              }
+            }
+
+
+          }
+        }
+      }
+
+
+    }
+
+  };
+
+  return {
+    doValidation : function (sa, property, obj) {
+      return doValidation(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+ShadowAnnotationsRegister.addValidator(ArrayValidator);
+
 
 var BigConverter = (function () {
   'use strict';
