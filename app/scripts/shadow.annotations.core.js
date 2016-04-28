@@ -387,6 +387,19 @@ var ReflectionUtils = (function () {
   'use strict';
 
 
+  var fixPropertyForShadowObject = function(property) {
+
+    var part1 = property.substring(0,property.indexOf('['));
+    var part2 = property.substring(property.indexOf(']')+1);
+    var result = part1+part2;
+
+    if(!!~result.indexOf('[')) {
+      return fixPropertyForShadowObject(result);
+    }
+    return result;
+  }
+
+
   function processAnnotations(obj, property, processorEnabled) {
 
     if(!DataBindingContext.isEnabled) {
@@ -436,9 +449,13 @@ var ReflectionUtils = (function () {
 
 
 
-    ///console.log('Adding setter getter for '+name+' on path '+path);
+    console.log('Adding setter getter for '+name+' on path '+path);
     var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(rootObj);
-    var shadowObj = getBeforeLast(rootShadowObj, path ? path+'.'+name: name);
+    var shadowPropertyPath = path ? path+'.'+name: name;
+    shadowPropertyPath = ~!!shadowPropertyPath.indexOf('[')? fixPropertyForShadowObject(shadowPropertyPath): shadowPropertyPath;
+
+    var shadowObj = getBeforeLast(rootShadowObj, shadowPropertyPath);
+    console.log(shadowObj);
     //var propertyValue = ReflectionUtils.getPropertyValue(obj, path ? path+'.'+name: name);
 
 
@@ -452,9 +469,9 @@ var ReflectionUtils = (function () {
 
       if(shadowAnnotations) {
 
-        //console.log(shadowAnnotations);
+        console.log(shadowAnnotations);
         var conversionAnnotation =  shadowAnnotations[i];
-        //console.log(conversionAnnotation);
+        console.log(conversionAnnotation);
         if(conversionAnnotation) {
           var converter = ShadowAnnotationsRegister.getConverter(i);
           converter.to(conversionAnnotation, path ? path+'.'+name: name, rootObj);
@@ -522,19 +539,19 @@ var ReflectionUtils = (function () {
 
   function createSettersGetters(obj, path) {
 
-    //console.log('----------------');
-    //console.log(obj);
-    //console.log('Create set get for path '+path);
+    console.log('----------------');
+    console.log(obj);
+    console.log('Create set get for path '+path);
     var rootObj = obj;
     obj = path ? ReflectionUtils.getPropertyValue(obj, path): obj;
-    //console.log(obj);
-    //console.log('/---------------');
+    console.log(obj);
+    console.log('/---------------');
 
     for ( var i in obj ) {
       if (obj.hasOwnProperty(i)) {
 
         if( !(i.indexOf('sa$') > -1)) {
-          //console.log('Create setter getter for '+i);
+          console.log('Create setter getter for '+i);
 
           if(isObject(obj[i])) {
             createSettersGetters(rootObj, path ? path+'.'+i: i);
@@ -622,10 +639,8 @@ var ReflectionUtils = (function () {
   function getBeforeLast(obj, property) {
 
     if(obj) {
-
       /* jshint validthis:true */
       if(!!~property.indexOf('.')) {
-
 
         var part1 = property.substr(0,property.indexOf('.'));
         var part2 = property.substr(property.indexOf('.')+1, property.length);
@@ -635,8 +650,6 @@ var ReflectionUtils = (function () {
         }
 
         return getBeforeLast(obj[part1], part2);
-
-
       }
       return obj;
     }
@@ -669,6 +682,17 @@ var ReflectionUtils = (function () {
         }
 
       }
+
+      if(!!~property.indexOf('[')) {
+        //console.log('--'+property.substr(0, property.indexOf('[')));
+        //console.log('--'+property);
+        //console.log(obj);
+        //console.log(obj[property.substr(0, property.indexOf('['))]);
+        //console.log(getArrayIndex(property));
+        return obj[property.substr(0, property.indexOf('['))][getArrayIndex(property)];
+      }
+
+
       return obj[property];
     }
     return obj;

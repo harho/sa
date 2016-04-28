@@ -22,11 +22,25 @@ var ArrayConverter = (function () {
           console.log('------------------->');
           console.log(name + '()');
           console.log(arguments);
+
           var result = fn.apply(jsArray, arguments);
+
+          if(name==='push') {
+            console.log('push ---------->');
+            console.log(property+'['+(jsArray.length-1)+']');
+            ReflectionUtils.createSettersGetters(obj, property+'['+(jsArray.length-1)+']');
+          }
+
           ArrayValidator.doValidation(null, property, obj)
           ShadowAnnotations.updateUi();
         }
       })()}
+
+      for(var i=0; i<jsArray.length;i++) {
+          console.log('createSettersGettes for array item.?????????????????????????????');
+          console.log(jsArray[i]);
+          ReflectionUtils.createSettersGetters(obj, property+'['+i+']');
+      }
 
     }
   };

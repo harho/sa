@@ -132,7 +132,7 @@ angular.module('test1App')
 
         items: [{name:'Item1', value:1},  {name:null, value:2},
           {name:null, value:null, subitems: [{name:'subitem3', value:null},
-            {name:'subitem4', value:null, subsubitems:[{name:'subsubitem6', value:null}]}]} ]
+            {name:'subitem4', value:null, subsubitems:[{name:'subsubitem6', value:null},{name:'subsubitem7', value:null}]}]} ]
 
 
      };
@@ -265,11 +265,12 @@ angular.module('test1App')
     function addItem() {
 
       var rn = Math.floor((Math.random() * 100) + 1);
-      $scope.user.items.push({name: 'Item '+rn, value:null});
+      $scope.user.items.push({name: 'Item '+rn, value:null, subitems:[{name:'suibtem'+rn+'.1', value:null},{name:'suibtem'+rn+'.2', value:null}]});
       return false;
     }
     function removeLastItem() {
-      $scope.user.items[2].subitems.pop();
+      //$scope.user.items[2].subitems[1].subsubitems.pop();
+      $scope.user.items[3].subitems.pop();
       return false;
 
     }
