@@ -6,9 +6,8 @@ var ArrayConverter = (function () {
   var to = function (sa, property, obj) {
 
     var jsArray = ReflectionUtils.getPropertyValue(obj, property);
-
-    console.log('This property '+property+' should be an array.');
-    console.log(jsArray);
+    //console.log('This property '+property+' should be an array.');
+    //console.log(jsArray);
 
     if(jsArray) {
 
@@ -19,26 +18,26 @@ var ArrayConverter = (function () {
         var fn = jsArray[name];
 
         jsArray[name] = function() {
-          console.log('------------------->');
-          console.log(name + '()');
-          console.log(arguments);
-
           var result = fn.apply(jsArray, arguments);
 
           if(name==='push') {
-            console.log('push ---------->');
-            console.log(property+'['+(jsArray.length-1)+']');
             ReflectionUtils.createSettersGetters(obj, property+'['+(jsArray.length-1)+']');
+            ArrayValidator.doValidation(null, property, obj)
           }
-
-          ArrayValidator.doValidation(null, property, obj)
+          else {
+            //if it is pop or splice, we need to do full validation
+            //there is no way, how to remove errors that was removed, yet
+            ValidationErrors.removeAllErrors();
+            ShadowAnnotations.doValidation(obj);
+          }
+          //ArrayValidator.doValidation(null, property, obj)
           ShadowAnnotations.updateUi();
         }
       })()}
 
       for(var i=0; i<jsArray.length;i++) {
-          console.log('createSettersGettes for array item.?????????????????????????????');
-          console.log(jsArray[i]);
+          //console.log('createSettersGettes for array item.');
+          //console.log(jsArray[i]);
           ReflectionUtils.createSettersGetters(obj, property+'['+i+']');
       }
 

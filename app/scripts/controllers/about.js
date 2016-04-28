@@ -270,7 +270,7 @@ angular.module('test1App')
     }
     function removeLastItem() {
       //$scope.user.items[2].subitems[1].subsubitems.pop();
-      $scope.user.items[3].subitems.pop();
+      $scope.user.items[$scope.user.items.length-1].subitems.pop();
       return false;
 
     }

@@ -18,6 +18,9 @@ var ShadowAnnotations = (function () {
     // UiUpdater
     //
     updateUi : function () {
+
+      //console.log('Updating UI errors and warnings count: '+(ValidationErrors.getErrors().length+ValidationWarnings.getWarnings().length));
+
       ShadowAnnotationsRegister.getUiUpdater().updateUi();
 
       for(var i=0; i < ShadowAnnotationsRegister.getAdditionalUiUpdaters().length; i++) {
@@ -447,15 +450,13 @@ var ReflectionUtils = (function () {
 
   function addSettersGetters(obj, rootObj, name, path) {
 
-
-
-    console.log('Adding setter getter for '+name+' on path '+path);
+    //console.log('Adding setter getter for '+name+' on path '+path);
     var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(rootObj);
     var shadowPropertyPath = path ? path+'.'+name: name;
     shadowPropertyPath = ~!!shadowPropertyPath.indexOf('[')? fixPropertyForShadowObject(shadowPropertyPath): shadowPropertyPath;
 
     var shadowObj = getBeforeLast(rootShadowObj, shadowPropertyPath);
-    console.log(shadowObj);
+    //console.log(shadowObj);
     //var propertyValue = ReflectionUtils.getPropertyValue(obj, path ? path+'.'+name: name);
 
 
@@ -469,9 +470,9 @@ var ReflectionUtils = (function () {
 
       if(shadowAnnotations) {
 
-        console.log(shadowAnnotations);
+        //console.log(shadowAnnotations);
         var conversionAnnotation =  shadowAnnotations[i];
-        console.log(conversionAnnotation);
+        //console.log(conversionAnnotation);
         if(conversionAnnotation) {
           var converter = ShadowAnnotationsRegister.getConverter(i);
           converter.to(conversionAnnotation, path ? path+'.'+name: name, rootObj);
@@ -481,8 +482,6 @@ var ReflectionUtils = (function () {
 
     obj[ShadowAnnotationsConstants.setGetPrefix + name] = function(newValue) {
 
-
-
       var oldValue = obj[name];
 
       if(arguments.length) {
@@ -490,9 +489,6 @@ var ReflectionUtils = (function () {
       }
 
       if(arguments.length) {
-
-
-
 
         //console.log('set '+name+' call '+newValue);
         //console.log(shadowObj);
@@ -539,19 +535,19 @@ var ReflectionUtils = (function () {
 
   function createSettersGetters(obj, path) {
 
-    console.log('----------------');
-    console.log(obj);
-    console.log('Create set get for path '+path);
+    //console.log('----------------');
+    //console.log(obj);
+    //console.log('Create set get for path '+path);
     var rootObj = obj;
     obj = path ? ReflectionUtils.getPropertyValue(obj, path): obj;
-    console.log(obj);
-    console.log('/---------------');
+    //console.log(obj);
+    //console.log('/---------------');
 
     for ( var i in obj ) {
       if (obj.hasOwnProperty(i)) {
 
         if( !(i.indexOf('sa$') > -1)) {
-          console.log('Create setter getter for '+i);
+          //console.log('Create setter getter for '+i);
 
           if(isObject(obj[i])) {
             createSettersGetters(rootObj, path ? path+'.'+i: i);
@@ -658,9 +654,9 @@ var ReflectionUtils = (function () {
   }
 
   function getArrayIndex(value) {
-    console.log('getArrayIndex: '+value);
+    //console.log('getArrayIndex: '+value);
     var index = value.substr(value.indexOf('[')+1, value.indexOf(']'));
-    console.log('Index: '+index);
+    //console.log('Index: '+index);
     return parseFloat(index);
   }
 
@@ -674,7 +670,7 @@ var ReflectionUtils = (function () {
         var part2 = property.substr(property.indexOf('.')+1, property.length);
 
         if(!!~part1.indexOf('[')) {
-            console.log(part1.substr(0, property.indexOf('[')));
+            //console.log(part1.substr(0, property.indexOf('[')));
             return getPropertyValue(obj[part1.substr(0, property.indexOf('['))][getArrayIndex(part1)], part2);
         }
         else {
@@ -844,7 +840,7 @@ var ShadowAnnotationsRegister = (function () {
 }());
 
 
-var NotEmptyValidator = (function () {
+/*var NotEmptyValidator = (function () {
   'use strict';
 
   var annotationName = 'notEmptyValidation';
@@ -853,8 +849,8 @@ var NotEmptyValidator = (function () {
   var doValidation = function (sa, property, obj) {
 
     var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    //console.log(obj);
-    //console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+    console.log(obj);
+    console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
 
     if(propertyValue==='' || propertyValue===null ) {
 
@@ -878,7 +874,7 @@ var NotEmptyValidator = (function () {
   };
 }());
 
-ShadowAnnotationsRegister.addValidator(NotEmptyValidator);
+ShadowAnnotationsRegister.addValidator(NotEmptyValidator);*/
 
 
 var EmailValidator = (function () {
@@ -1016,7 +1012,7 @@ var ArrayValidator = (function () {
 
   var doValidation = function (sa, property, obj) {
 
-    console.log('property:'+property);
+    //console.log('property:'+property);
 
     var rootObj = obj;
     var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(obj);
@@ -1030,22 +1026,13 @@ var ArrayValidator = (function () {
     }
     for ( var k = 0; k < obj.length; k++ ) {
 
-      console.log('Array validation property: '+property);
-      console.log('Array validation: '+k);
-      console.log(obj[k]);
-      console.log(shadowObj);
-      //BeanValidator.doValidation(shadowObj, null,  obj[i]);
-
       for ( var i in shadowObj ) {
 
-        console.log(i);
+        //console.log(i);
 
         if(i.indexOf(ShadowAnnotationsConstants.prefix) > -1) {
 
           var shadowAnnotations = shadowObj[i];
-
-          console.log('--> shadowAnnotations');
-          console.log(shadowAnnotations);
 
           for ( var j in shadowAnnotations ) {
 
@@ -1053,14 +1040,7 @@ var ArrayValidator = (function () {
 
               var validator = ShadowAnnotationsRegister.getValidator(j);
 
-              console.log('--> validator');
-              console.log(validator);
-              console.log(shadowAnnotations[j]);
-
               if(validator) {
-                console.log('--> validator');
-                console.log(property? property+'['+k+'].'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''));
-
                 validator.doValidation(shadowAnnotations[j], property? property+'['+k+'].'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
               }
               else {
