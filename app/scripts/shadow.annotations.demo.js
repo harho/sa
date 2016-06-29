@@ -63,6 +63,58 @@ var ArrayConverter = (function () {
 
 ShadowAnnotationsRegister.addConverter(ArrayConverter);
 
+var BigConverter = (function () {
+  'use strict';
+
+  var annotationName = 'bigConversion';
+
+  var to = function (sa, property, obj) {
+
+    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+    //console.log('Running conversion > to > for annotation '+annotationName+' for '+property+': '+propertyValue);
+
+    if(propertyValue) {
+
+      var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
+
+      //console.log(ownerObj);
+      var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
+      ownerObj[propertyName] = new Big(propertyValue);
+    }
+  };
+
+  var from = function (sa, property, obj) {
+
+    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+    //console.log('Running conversion > from > for annotation '+annotationName+' for '+property+': '+propertyValue);
+
+    if(propertyValue) {
+      var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
+
+      var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
+
+      ownerObj[propertyName] = parseFloat(propertyValue);
+      //console.log(ownerObj[propertyName]);
+    }
+  };
+
+  return {
+    to : function (sa, property, obj) {
+      return to(sa, property, obj);
+    },
+    from : function (sa, property, obj) {
+      return from(sa, property, obj);
+    },
+    getAnnotationName: function() {
+      return annotationName;
+    }
+
+  };
+}());
+
+ShadowAnnotationsRegister.addConverter(BigConverter);
+
+
 
 var CityParamsValidator = (function () {
   'use strict';
@@ -240,6 +292,9 @@ var UiUpdater = (function () {
     for (var i in errorsPerPath ) {
 
       var binding  = bindings[errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property];
+      //console.log(errorsPerPath[i].objectKey+'.'+errorsPerPath[i].property);
+      //console.log(binding);
+      //console.log(bindings);
 
       if(binding) {
 

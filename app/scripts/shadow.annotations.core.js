@@ -1,4 +1,6 @@
-
+/**
+ * Shadow annottations core. Core features, validators, converters.
+ */
 (function () {
   'use strict';
   if (typeof String.prototype.endsWith !== 'function') {
@@ -20,7 +22,6 @@ var ShadowAnnotations = (function () {
     updateUi : function () {
 
       //console.log('Updating UI errors and warnings count: '+(ValidationErrors.getErrors().length+ValidationWarnings.getWarnings().length));
-
       ShadowAnnotationsRegister.getUiUpdater().updateUi();
 
       for(var i=0; i < ShadowAnnotationsRegister.getAdditionalUiUpdaters().length; i++) {
@@ -623,6 +624,7 @@ var ReflectionUtils = (function () {
     //console.log('Get shadow annotations for '+property);
     var shadowObj = ShadowAnnotationsRegister.getShadowObject(obj);
     var obj2 = getBeforeLast(shadowObj, property);
+    //console.log(obj2)
     var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
     //console.log(obj2['sa$'+propertyName]);
     //console.log('/-----------------------------------');
@@ -634,14 +636,26 @@ var ReflectionUtils = (function () {
 
   function getBeforeLast(obj, property) {
 
+    //console.log('-------------->>>');
+    //console.log('property: '+property);
+
     if(obj) {
       /* jshint validthis:true */
       if(!!~property.indexOf('.')) {
 
+        //console.log('??????????????')
         var part1 = property.substr(0,property.indexOf('.'));
         var part2 = property.substr(property.indexOf('.')+1, property.length);
 
-        if(!(!!~part2.indexOf('.'))) {
+        if(!!~part1.indexOf('[')) {
+          //console.log(part1);
+          //console.log(obj);
+          //console.log('aaa');
+          //console.log(part1.substr(0, property.indexOf('[')));
+          //console.log(obj[part1.substr(0, property.indexOf('['))]);
+          return getBeforeLast(obj[part1.substr(0, property.indexOf('['))], part2);
+        }
+        else if(!(!!~part2.indexOf('.'))) {
           return obj[part1];
         }
 
@@ -914,7 +928,9 @@ var EmailValidator = (function () {
 }());
 
 ShadowAnnotationsRegister.addValidator(EmailValidator);
-
+/**
+ * BeanValidator, validates js objects (js objects lol).
+ */
 var BeanValidator = (function () {
   'use strict';
 
@@ -993,7 +1009,9 @@ var BeanValidator = (function () {
 
 ShadowAnnotationsRegister.addValidator(BeanValidator);
 
-
+/**
+ * ArrayValidator, validates js arrays.
+ */
 var ArrayValidator = (function () {
   'use strict';
 
@@ -1075,8 +1093,6 @@ var ArrayValidator = (function () {
           }
         }
       }
-
-
     }
 
   };
@@ -1094,40 +1110,56 @@ var ArrayValidator = (function () {
 
 ShadowAnnotationsRegister.addValidator(ArrayValidator);
 
-
-var BigConverter = (function () {
+/**
+ * ArrayConverter, converts js arrays to the form, that fits shadow annotations needs.
+ */
+var ArrayConverter = (function () {
   'use strict';
 
-  var annotationName = 'bigConversion';
+  var annotationName = 'arrayConversion';
 
   var to = function (sa, property, obj) {
 
-    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    //console.log('Running conversion > to > for annotation '+annotationName+' for '+property+': '+propertyValue);
+    var jsArray = ReflectionUtils.getPropertyValue(obj, property);
+    //console.log('This property '+property+' should be an array.');
+    //console.log(jsArray);
 
-    if(propertyValue) {
+    if(jsArray) {
 
-      var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
+      var fns = ['push', 'pop', 'splice'];
 
-      //console.log(ownerObj);
-      var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
-      ownerObj[propertyName] = new Big(propertyValue);
+      for (var i in fns) { (function() {
+        var name = fns[i]
+        var fn = jsArray[name];
+
+        jsArray[name] = function() {
+          var result = fn.apply(jsArray, arguments);
+
+          if(name==='push') {
+            ReflectionUtils.createSettersGetters(obj, property+'['+(jsArray.length-1)+']');
+            ArrayValidator.doValidation(null, property, obj)
+          }
+          else {
+            //if it is pop or splice, we need to do full validation
+            //there is no way, how to remove errors that was removed, yet
+            ValidationErrors.removeAllErrors();
+            ShadowAnnotations.doValidation(obj);
+          }
+          //ArrayValidator.doValidation(null, property, obj)
+          ShadowAnnotations.updateUi();
+        }
+      })()}
+
+      for(var i=0; i<jsArray.length;i++) {
+        //console.log('createSettersGettes for array item.');
+        //console.log(jsArray[i]);
+        ReflectionUtils.createSettersGetters(obj, property+'['+i+']');
+      }
+
     }
   };
 
   var from = function (sa, property, obj) {
-
-    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    //console.log('Running conversion > from > for annotation '+annotationName+' for '+property+': '+propertyValue);
-
-    if(propertyValue) {
-      var ownerObj = ReflectionUtils.getBeforeLast(obj, property);
-
-      var propertyName = property.substr(property.lastIndexOf('.')+1, property.length);
-
-      ownerObj[propertyName] = parseFloat(propertyValue);
-      //console.log(ownerObj[propertyName]);
-    }
   };
 
   return {
@@ -1144,4 +1176,4 @@ var BigConverter = (function () {
   };
 }());
 
-ShadowAnnotationsRegister.addConverter(BigConverter);
+ShadowAnnotationsRegister.addConverter(ArrayConverter);

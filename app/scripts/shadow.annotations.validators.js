@@ -7,8 +7,6 @@ var NotEmptyValidator = (function () {
   var doValidation = function (sa, property, obj) {
 
     var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    //console.log(obj);
-    //console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
 
     if(propertyValue==='' || propertyValue===null ) {
 

@@ -96,6 +96,46 @@ angular.module('test1App')
     }
   })
 
+  .directive('saBindWithIndex', function () {
+    return {
+      priority:1,
+      restrict: 'A', // only activate on element attribute
+      require:  ['ngModel', '^?form', '^?ngModelOptions'], // get a hold of NgModelController
+      link: function (scope, element, attrs, ngModel) {
+
+        var indexes = attrs.saBindWithIndex.split(',');
+        var property = attrs.ngModel;
+        var propertyPath = replaseIndexies(indexes, property);
+
+        propertyPath = propertyPath.replace('sg_','');
+
+        DataBindingContext.addBinding(propertyPath, element[0]);
+        ShadowAnnotationsRegister.getUiUpdater().updateControlUi(propertyPath);
+
+
+        function replaseIndexies(indexes, path) {
+          for(var i = indexes.length; i>0; i-- ) {
+            path = path.replace(replaseString(i)+'$index', indexes[indexes.length-i])
+            //console.log(indexes.length-i);
+            //console.log(path);
+          }
+          return path;
+        }
+        function replaseString(index) {
+          var result = ''
+          for(var i = index-1; i>0; i-- ) {
+            result += '$parent.';
+          }
+          //console.log('replace string '+result);
+          return result;
+        }
+      },
+
+
+
+    }
+  })
+
   .controller('AboutCtrl', function ($scope) {
 
     $scope.validationErrors = ValidationErrors.getErrors();

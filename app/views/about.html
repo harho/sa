@@ -11,10 +11,12 @@
         <button class="btn btn-primary btn-sm" ng-click="convertFrom()">Convert from</button>
     </div>
 
+    <br>
+
     <!--<div>Errors: <b>{{errors|json}}</b></div>-->
-    <div>Validation Errors: <b>{{validationErrors|json}}</b></div>
+    <!--<div>Validation Errors: <b>{{validationErrors|json}}</b></div>
     <div>Total: <b>{{user.total}}</b></div>
-    <div>Total number: <b>{{user.totalNumber.toString()}}</b></div>
+    <div>Total number: <b>{{user.totalNumber.toString()}}</b></div>-->
 </div>
 <div class="row">
     <div class="col-xs-12 col-sm-7">
@@ -56,7 +58,7 @@
                     <input type="text" readonly sa-model sa-bind ng-model="user.email" class="form-control" id="email" name="email" placeholder="Enter Email">
                 </div>
             </div>
-            <!--
+
             <div class="form-group">
                 <label for="email" class="col-sm-2 control-label">Street</label>
                 <div class="col-sm-10">
@@ -85,7 +87,7 @@
                 <div class="col-sm-10">
                     <input type="number" readonly sa-model sa-bind ng-model="user.value2" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
                 </div>
-            </div>-->
+            </div>
 
 
           <div class="form-group" id="items">
@@ -108,6 +110,55 @@
 
 
           </div>
+
+          <div class="form-group" id="items2">
+
+            <label for="items" class="col-sm-2 control-label">Items II.</label>
+            <label for="items" class="col-sm-10 control-label">&nbsp;</label>
+
+
+            <div ng-repeat="item in user.items">
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Name {{$index}}</label>
+                <div class="col-sm-10">
+                  <input type="text" sa-model sa-bind-with-index="{{$index}}" ng-model="user.items[$index].name">
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Value {{$index}}</label>
+                <div class="col-sm-10">
+                  <input type="text" sa-model sa-bind-with-index="{{$index}}" ng-model="user.items[$index].value">
+                </div>
+              </div>
+
+              <div ng-repeat="subitem in item.subitems">
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">SName {{$parent.$index}}.{{$index}}</label>
+                  <div class="col-sm-10">
+                    <input type="text" sa-model sa-bind-with-index="{{$parent.$index}},{{$index}}" ng-model="user.items[$parent.$index].subitems[$index].name">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">SValue {{$parent.$index}}.{{$index}}</label>
+                  <div class="col-sm-10">
+                    <input type="text" sa-model sa-bind-with-index="{{$parent.$index}},{{$index}}" ng-model="user.items[$parent.$index].subitems[$index].value">
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+
+
+
+          </div>
+
+
+          </div>
+
+
+
 
             <div class="form-group">
                 <label for="noteValue" class="col-sm-2 control-label">Note value</label>
@@ -134,8 +185,8 @@
 
 <br/>
 
-<div>User: <b>{{user|json}}</b></div></br>
-<div>User clone: <b>{{data.userClone|json}}</b></div>
+<!--<div>User: <b>{{user|json}}</b></div></br>
+<div>User clone: <b>{{data.userClone|json}}</b></div>-->
 
 <script>
         $(document).ready(function(){
