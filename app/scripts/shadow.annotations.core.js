@@ -451,6 +451,9 @@ var ReflectionUtils = (function () {
 
   function addSettersGetters(obj, rootObj, name, path) {
 
+    if(name.indexOf('sg')>=0) {
+      return;
+    }
     //console.log('Adding setter getter for '+name+' on path '+path);
     var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(rootObj);
     var shadowPropertyPath = path ? path+'.'+name: name;
@@ -561,6 +564,75 @@ var ReflectionUtils = (function () {
     }
   }
 
+  function copyProperties(fromObj, toObj, path) {
+
+    var fromRootObj = fromObj;
+    var toRootObj = toObj;
+    fromObj = path ? ReflectionUtils.getPropertyValue(fromObj, path): fromObj;
+    toObj = path ? ReflectionUtils.getPropertyValue(toObj, path): toObj;
+
+
+
+    for ( var i in fromObj ) {
+
+      if (fromObj.hasOwnProperty(i) && typeof fromObj[i] !== "function" ) {
+        //console.log('Copy property '+(path ? path+'.'+i: i));
+
+        if(isObject(fromObj[i])) {
+          var needToCreateSettersGetters = false;
+          //check if object exist in toObj instance
+          if(!toObj[i]) {
+            toObj[i] = {};
+            needToCreateSettersGetters = true;
+          }
+
+          copyProperties(fromRootObj, toRootObj, path ? path+'.'+i: i);
+
+          if(needToCreateSettersGetters) {
+            createSettersGetters(toRootObj, path ? path+'.'+i: i);
+          }
+        }
+        else {
+
+
+
+          if(Array.isArray(fromObj[i])) {
+
+            for(var j=0; j < fromObj[i].length; j++) {
+
+              if(isObject(fromObj[i][j])) {
+                ReflectionUtils.createSettersGetters(fromObj[i][j], '');
+              }
+
+              if(!toObj[i]) {
+                toObj[i] = [];
+              }
+              // if object exists then ...
+              if(toObj[i][j] && isObject(toObj[i][j])) {
+                copyProperties(fromObj[i][j], toObj[i][j]);
+              }
+              else {
+                fromObj[i][j] = toObj[i][j];
+              }
+            }
+
+          }
+          else {
+
+            var oldValue = toObj[i];
+            toObj[i] = fromObj[i]
+
+            if (oldValue !== toObj[i]) {
+              console.log('Property ' + (path ? path + '.' + i : i) + ' changed from:"' + oldValue + '" to value:"' + toObj[i] + '"');
+            }
+          }
+        }
+
+      }
+
+    }
+  }
+
   function doConversionFrom(obj, rootObj, name, path) {
 
     //console.log('--> Converting > from > property '+name+' on path '+path);
@@ -619,6 +691,7 @@ var ReflectionUtils = (function () {
   }
 
 
+
   function getShadowAnnotations(obj, property) {
     //console.log('------------------------------------');
     //console.log('Get shadow annotations for '+property);
@@ -632,7 +705,6 @@ var ReflectionUtils = (function () {
 
 
   }
-
 
   function getBeforeLast(obj, property) {
 
@@ -673,6 +745,7 @@ var ReflectionUtils = (function () {
     //console.log('Index: '+index);
     return parseFloat(index);
   }
+
 
   function getPropertyValue(obj, property) {
 
@@ -727,6 +800,12 @@ var ReflectionUtils = (function () {
     },
     convertFrom: function(obj) {
       return convertFrom(obj);
+    },
+    convertTo: function(obj) {
+      return convertTo(obj);
+    },
+    copyProperties: function(fromObj, toObj, path) {
+      copyProperties(fromObj, toObj, path);
     }
   };
 
@@ -1133,11 +1212,42 @@ var ArrayConverter = (function () {
         var fn = jsArray[name];
 
         jsArray[name] = function() {
+
           var result = fn.apply(jsArray, arguments);
 
           if(name==='push') {
             ReflectionUtils.createSettersGetters(obj, property+'['+(jsArray.length-1)+']');
             ArrayValidator.doValidation(null, property, obj)
+          }
+          else if(name==='splice') {
+
+            ValidationErrors.removeAllErrors();
+            var bindings = DataBindingContext.getBindings();
+            var objectKey = obj[ShadowAnnotationsConstants.key];
+
+            for(var j=arguments[0]; j<=jsArray.length;j++) {
+
+              var bindingPath = objectKey+'.'+property+'['+j+']';
+              var nextBindingPath = objectKey+'.'+property+'['+(j+1)+']';
+              for(var i in bindings) {
+
+                if(i.indexOf(bindingPath)>=0) {
+
+                  if(j===jsArray.length) {
+                    delete bindings[i];
+                  }
+                  else {
+                    var iPlusOne = i.replace(bindingPath, nextBindingPath);
+                    bindings[i] = bindings[iPlusOne];
+                  }
+                }
+              }
+            }
+            for(var i=0; i<jsArray.length;i++) {
+              ReflectionUtils.createSettersGetters(obj, property+'['+i+']');
+            }
+            ShadowAnnotations.doValidation(obj);
+
           }
           else {
             //if it is pop or splice, we need to do full validation
@@ -1151,8 +1261,8 @@ var ArrayConverter = (function () {
       })()}
 
       for(var i=0; i<jsArray.length;i++) {
-        //console.log('createSettersGettes for array item.');
-        //console.log(jsArray[i]);
+        console.log('createSettersGettes for array item.');
+        console.log(jsArray[i]);
         ReflectionUtils.createSettersGetters(obj, property+'['+i+']');
       }
 

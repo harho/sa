@@ -130,9 +130,6 @@ angular.module('test1App')
           return result;
         }
       },
-
-
-
     }
   })
 
