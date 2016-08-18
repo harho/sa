@@ -270,6 +270,7 @@ var ValidationErrors = (function () {
       for(var j = 0; j < properties.length; j++) {
 
         if(errors[i].property === properties[j] && errors[i].objectKey === key) {
+          //console.log('Contains error for property: '+properties[j]+' error key: '+errors[i].errorKey);
           return true;
         }
       }
@@ -612,7 +613,7 @@ var ReflectionUtils = (function () {
                 copyProperties(fromObj[i][j], toObj[i][j]);
               }
               else {
-                fromObj[i][j] = toObj[i][j];
+                toObj[i][j] = fromObj[i][j];
               }
             }
 
@@ -632,6 +633,9 @@ var ReflectionUtils = (function () {
 
     }
   }
+
+
+
 
   function doConversionFrom(obj, rootObj, name, path) {
 
@@ -660,7 +664,6 @@ var ReflectionUtils = (function () {
 
   }
 
-
   function convertFrom(obj, path) {
     //console.log('----> Converting from call --->>>');
     var rootObj = obj;
@@ -682,14 +685,68 @@ var ReflectionUtils = (function () {
       }
     }
     return obj;
+  }
+
+  function doConversionTo(obj, rootObj, name, path) {
+
+    //console.log('--> Converting > to > property ' + name + ' on path ' + path);
+    var rootShadowObj = ShadowAnnotationsRegister.getShadowObject(rootObj);
+    var shadowObj = getBeforeLast(rootShadowObj, path ? path + '.' + name : name);
+    //var propertyValue = ReflectionUtils.getPropertyValue(obj, path ? path+'.'+name: name);
+
+    if (shadowObj) {
+      // processing converters
+      var converters = ShadowAnnotationsRegister.getAllConverters();
+
+      var shadowAnnotations = shadowObj[ShadowAnnotationsConstants.prefix + name];
+
+      for (var i in converters) {
+
+        if (shadowAnnotations) {
+
+          //console.log(shadowAnnotations);
+          var conversionAnnotation = shadowAnnotations[i];
+          //console.log(conversionAnnotation);
+          if (conversionAnnotation) {
+            var converter = ShadowAnnotationsRegister.getConverter(i);
+            converter.to(conversionAnnotation, path ? path + '.' + name : name, rootObj);
+          }
+        }
+      }
+    }
 
   }
+
+
+  function convertTo(obj, path) {
+    //console.log('----> Converting to call --->>>');
+    var rootObj = obj;
+    obj = path ? ReflectionUtils.getPropertyValue(obj, path): obj;
+
+    for ( var i in obj ) {
+      if (obj.hasOwnProperty(i)) {
+
+        if( !(i.indexOf(ShadowAnnotationsConstants.prefix) > -1) && !(i.indexOf(ShadowAnnotationsConstants.setGetPrefix) > -1)) {
+          //console.log('----> Converting property: '+i);
+
+          if(isObject(obj[i])) {
+            convertTo(rootObj, path ? path+'.'+i: i);
+          }
+
+          doConversionTo(obj, rootObj, i, path);
+        }
+
+      }
+    }
+    return obj;
+
+  }
+
 
 
   function isObject(obj) {
     return (!!obj) && (obj.constructor === Object);
   }
-
 
 
   function getShadowAnnotations(obj, property) {
@@ -705,6 +762,7 @@ var ReflectionUtils = (function () {
 
 
   }
+
 
   function getBeforeLast(obj, property) {
 
@@ -746,7 +804,6 @@ var ReflectionUtils = (function () {
     return parseFloat(index);
   }
 
-
   function getPropertyValue(obj, property) {
 
     if(obj && property) {
@@ -757,8 +814,8 @@ var ReflectionUtils = (function () {
         var part2 = property.substr(property.indexOf('.')+1, property.length);
 
         if(!!~part1.indexOf('[')) {
-            //console.log(part1.substr(0, property.indexOf('[')));
-            return getPropertyValue(obj[part1.substr(0, property.indexOf('['))][getArrayIndex(part1)], part2);
+          //console.log(part1.substr(0, property.indexOf('[')));
+          return getPropertyValue(obj[part1.substr(0, property.indexOf('['))][getArrayIndex(part1)], part2);
         }
         else {
           return getPropertyValue(obj[part1], part2);
@@ -789,6 +846,7 @@ var ReflectionUtils = (function () {
     getBeforeLast: function(obj, property) {
       return getBeforeLast(obj, property);
     },
+
     getShadowAnnotations : function(obj, property) {
       return getShadowAnnotations(obj, property);
     },
@@ -934,40 +992,40 @@ var ShadowAnnotationsRegister = (function () {
 
 
 /*var NotEmptyValidator = (function () {
-  'use strict';
+ 'use strict';
 
-  var annotationName = 'notEmptyValidation';
-  var defaultErrorKey = 'error.validation.not.empty';
+ var annotationName = 'notEmptyValidation';
+ var defaultErrorKey = 'error.validation.not.empty';
 
-  var doValidation = function (sa, property, obj) {
+ var doValidation = function (sa, property, obj) {
 
-    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    console.log(obj);
-    console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+ var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+ console.log(obj);
+ console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
 
-    if(propertyValue==='' || propertyValue===null ) {
+ if(propertyValue==='' || propertyValue===null ) {
 
-      ValidationErrors.addError({ property: property, errorKey: defaultErrorKey, objectKey: obj[ShadowAnnotationsConstants.key] });
+ ValidationErrors.addError({ property: property, errorKey: defaultErrorKey, objectKey: obj[ShadowAnnotationsConstants.key] });
 
-    }
-    else {
+ }
+ else {
 
-      ValidationErrors.removeError(property, defaultErrorKey);
-    }
-  };
+ ValidationErrors.removeError(property, defaultErrorKey);
+ }
+ };
 
-  return {
-    doValidation : function (sa, property, obj) {
-      return doValidation(sa, property, obj);
-    },
-    getAnnotationName: function() {
-      return annotationName;
-    }
+ return {
+ doValidation : function (sa, property, obj) {
+ return doValidation(sa, property, obj);
+ },
+ getAnnotationName: function() {
+ return annotationName;
+ }
 
-  };
-}());
+ };
+ }());
 
-ShadowAnnotationsRegister.addValidator(NotEmptyValidator);*/
+ ShadowAnnotationsRegister.addValidator(NotEmptyValidator);*/
 
 
 var EmailValidator = (function () {
@@ -1086,7 +1144,7 @@ var BeanValidator = (function () {
   };
 }());
 
-ShadowAnnotationsRegister.addValidator(BeanValidator);
+//ShadowAnnotationsRegister.addValidator(BeanValidator);
 
 /**
  * ArrayValidator, validates js arrays.
@@ -1097,18 +1155,19 @@ var ArrayValidator = (function () {
   var annotationName = 'arrayValidation';
 
   var fixPropertyForShadowObject = function(property) {
-        var part1 = property.substring(0,property.indexOf('['));
-        var part2 = property.substring(property.indexOf(']')+1);
-        var result = part1+part2;
+    var part1 = property.substring(0,property.indexOf('['));
+    var part2 = property.substring(property.indexOf(']')+1);
+    var result = part1+part2;
 
-        if(!!~result.indexOf('[')) {
-          return fixPropertyForShadowObject(result);
-        }
-        return result;
+    if(!!~result.indexOf('[')) {
+      return fixPropertyForShadowObject(result);
+    }
+    return result;
   }
 
   var doValidation = function (sa, property, obj) {
 
+    //console.log('ArrayValidator call.');
     //console.log('property:'+property);
 
     var rootObj = obj;
@@ -1116,8 +1175,10 @@ var ArrayValidator = (function () {
     obj = property ? ReflectionUtils.getPropertyValue(obj, property): obj;
     var shadowObj = property ? ReflectionUtils.getPropertyValue(rootShadowObj, fixPropertyForShadowObject(property)): rootShadowObj;
 
-    //var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
-    // console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+    var propertyValue = ReflectionUtils.getPropertyValue(obj, property);
+    //console.log('Running validation for annotation '+annotationName+' for '+property+':'+propertyValue);
+    //console.log(obj);
+    //console.log(shadowObj);
     if(!obj) {
       return;
     }
@@ -1133,11 +1194,13 @@ var ArrayValidator = (function () {
 
           for ( var j in shadowAnnotations ) {
 
-            if(j.endsWith('Validation')) {
+            if(j.endsWith('Validation') && j!=='startValidation') {
 
               var validator = ShadowAnnotationsRegister.getValidator(j);
 
               if(validator) {
+
+
                 validator.doValidation(shadowAnnotations[j], property? property+'['+k+'].'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
               }
               else {
@@ -1158,14 +1221,14 @@ var ArrayValidator = (function () {
 
             }
             else {
-              // after all it must be a processor
-              var processor = ShadowAnnotationsRegister.getProcessor(j);
-              if(processor) {
-                processor.process(shadowAnnotations[j], property? property+'.'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
-              }
-              else {
-                console.warn('Processor for annotation '+j+' not found');
-              }
+              /*// after all it must be a processor
+               var processor = ShadowAnnotationsRegister.getProcessor(j);
+               if(processor) {
+               processor.process(shadowAnnotations[j], property? property+'.'+i.replace(ShadowAnnotationsConstants.prefix,''): i.replace(ShadowAnnotationsConstants.prefix,'',''), rootObj);
+               }
+               else {
+               console.warn('Processor for annotation '+j+' not found');
+               }*/
             }
 
 
