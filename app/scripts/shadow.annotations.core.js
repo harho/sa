@@ -308,7 +308,13 @@ var ValidationErrors = (function () {
 
       for (var i = 0; i < errors.length; i++) {
         if(errors[i].property === validationError.property && errors[i].errorKey === validationError.errorKey) {
-          return;
+
+          if(validationError.errorParams && errors[i].errorParams.toString()!=validationError.errorParams.toString()) {
+            errors[i] = validationError;
+          }
+          else {
+            return;
+          }
         }
       }
 
