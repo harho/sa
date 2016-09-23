@@ -309,12 +309,10 @@ var ValidationErrors = (function () {
       for (var i = 0; i < errors.length; i++) {
         if(errors[i].property === validationError.property && errors[i].errorKey === validationError.errorKey) {
 
-          if(validationError.errorParams && errors[i].errorParams.toString()!=validationError.errorParams.toString()) {
+          if(validationError.errorParams && JSON.stringify(errors[i].errorParams)!=JSON.stringify(validationError.errorParams)) {
             errors[i] = validationError;
           }
-          else {
-            return;
-          }
+          return;
         }
       }
 
