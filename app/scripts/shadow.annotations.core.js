@@ -627,6 +627,10 @@ var ReflectionUtils = (function () {
 
           if(Array.isArray(fromObj[i])) {
 
+            if(toObj[i] && toObj[i].length !== fromObj[i].length) {
+              toObj[i].length = fromObj[i].length;
+            }
+
             for(var j=0; j < fromObj[i].length; j++) {
 
               if(isObject(fromObj[i][j])) {
@@ -652,7 +656,7 @@ var ReflectionUtils = (function () {
             toObj[i] = fromObj[i]
 
             if (oldValue !== toObj[i]) {
-              console.log('Property ' + (path ? path + '.' + i : i) + ' changed from:"' + oldValue + '" to value:"' + toObj[i] + '"');
+              //console.log('Property ' + (path ? path + '.' + i : i) + ' changed from:"' + oldValue + '" to value:"' + toObj[i] + '"');
             }
           }
         }
