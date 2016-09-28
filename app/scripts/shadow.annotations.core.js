@@ -1312,7 +1312,8 @@ var ArrayConverter = (function () {
 
           if(name==='push') {
             ReflectionUtils.createSettersGetters(obj, property+'['+(jsArray.length-1)+']');
-            ArrayValidator.doValidation(null, property, obj)
+            //ArrayValidator.doValidation(null, property, obj);
+            ShadowAnnotations.doValidation(obj);
           }
           else if(name==='splice') {
 
