@@ -121,6 +121,10 @@ var ShadowAnnotations = (function () {
     setGlobalValidator : function (validator) {
       return ShadowAnnotationsRegister.setGlobalValidator(validator);
     },
+    addGlobalValidator : function (key, validator) {
+      return ShadowAnnotationsRegister.addGlobalValidator(key, validator);
+    },
+
     /*getValidator : function (annotationName) {
      return ShadowAnnotationsRegister.getValidator(annotationName);
      },*/
@@ -163,6 +167,9 @@ var ShadowAnnotations = (function () {
     },
     getErrors: function () {
       return ValidationErrors.getErrors();
+    },
+    removeAllError: function() {
+      return ValidationErrors.removeAllErrors();
     }
 
 
