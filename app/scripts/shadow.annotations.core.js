@@ -573,13 +573,22 @@ var ReflectionUtils = (function () {
   }
 
 
-  function createSettersGetters(obj, path) {
+
+
+  function createSettersGetters(obj, path, rootObject) {
 
     //console.log('----------------');
     //console.log(obj);
     //console.log('Create set get for path '+path);
-    var rootObj = obj;
-    obj = path ? ReflectionUtils.getPropertyValue(obj, path): obj;
+
+    var rootObj = null;
+    if(rootObject) {
+      var rootObj = rootObject;
+    }
+    else {
+      var rootObj = obj;
+      obj = path ? ReflectionUtils.getPropertyValue(obj, path) : obj;
+    }
     //console.log(obj);
     //console.log('/---------------');
 
@@ -889,8 +898,8 @@ var ReflectionUtils = (function () {
     getShadowAnnotations : function(obj, property) {
       return getShadowAnnotations(obj, property);
     },
-    createSettersGetters: function(obj, path) {
-      return createSettersGetters(obj, path);
+    createSettersGetters: function(obj, path, rootObject) {
+      return createSettersGetters(obj, path, rootObject);
     },
     cloneObject: function(obj) {
       return JSON.parse(JSON.stringify(obj));
