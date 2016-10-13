@@ -620,7 +620,7 @@ var ReflectionUtils = (function () {
 
     for ( var i in fromObj ) {
 
-      if (fromObj.hasOwnProperty(i) && typeof fromObj[i] !== "function" ) {
+      if (fromObj.hasOwnProperty(i) && typeof fromObj[i] !== 'function' ) {
         //console.log('Copy property '+(path ? path+'.'+i: i));
 
         if(isObject(fromObj[i])) {
