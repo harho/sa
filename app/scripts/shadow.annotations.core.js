@@ -854,7 +854,7 @@ var ReflectionUtils = (function () {
 
   function getPropertyValue(obj, property) {
 
-    if(obj && property) {
+    if(obj && property && !Array.isArray(obj)) {
 
       if(!!~property.indexOf('.')) {
 
