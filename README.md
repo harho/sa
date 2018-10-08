@@ -1,7 +1,8 @@
-Shadow Annotations / Reactive Annotations
+# Shadow Annotations
+
 Shadows Annotations is javascript library for AngularJS, Angular2.
 After many years developing enterprise applications I realized that we do something wrong and it was beginning of Shadow Annotations/Reactive Annotations.
-The idea behind SA/RA is very simple. It is based on reactive model and what is reactive model?
+The idea behind SA is very simple. It is based on reactive model and what is reactive model?
 Frankly, it is model that knows how to react when his attribute is changed. 
 Let image person model. Every person has first and last name.
 ```
@@ -42,8 +43,11 @@ Or just create “shadow” object that holds only annotations. (It is better wh
 }
 ```
 Now we can link our model with shadow model and the magic with SA can happens. 
+
+```
 ShadowAnnotations.link('model', this.model, this.shadowModel, true);
 ShadowAnnotations.enable();
+```
 
 Every time the value of first or last name is changed, model reacts and validates himself and validation errors are propagated.
 
