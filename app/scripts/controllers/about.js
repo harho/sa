@@ -1,34 +1,5 @@
 'use strict';
 
-
-var user = {
-
-    value1 : 9007199254740990,
-    value2 : 0.9999,
-    email: null,
-    total: 0,
-    totalNumber: 0,
-    name : 'Pablo',
-    geek: true,
-    file: null,
-    address: {
-        street: null,
-        city: 'Humenné',
-        note: {
-            value: null,
-            number1: 9007199254740990,
-            number2: 0.9999,
-        },
-
-    },
-
-    items: [{name:'Item1', value:1},  {name:null, value:2},
-      {name:null, value:null, subitems: [{name:'subitem3', value:null},
-        {name:'subitem4', value:null, subsubitems:[{name:'subsubitem6', value:null},{name:'subsubitem7', value:null}]}]} ]
-
-
- };
-
 /**
  * @ngdoc function
  * @name test1App.controller:AboutCtrl
@@ -49,9 +20,7 @@ angular.module('test1App')
                     //from modtel to UI
                     //when code change model
                     if(value){
-                        console.log("value1", value)
                         return new Big(value);
-                        
                     }
                     //return value.toUpperCase();
 
@@ -111,41 +80,6 @@ angular.module('test1App')
     }
 })
 
-    .directive('fileModel', ['$parse', function ($parse) {
-            return {
-                restrict: 'A',
-                require: 'ngModel',
-                link: function(scope, element, attrs,ngModel) {
-                    // var model = $parse(attrs.ngModel);
-                    // var modelSetter = model.assign;
-                        element.bind('change', function(){
-                         $parse(attrs.fileModel).assign(scope,element[0].files[0])
-                           scope.$apply(function(){
-                            // modelSetter(scope, element[0].files[0]);
-                            ReflectionUtils.createSettersGetters(file, '');
-                            ShadowAnnotations.doValidation(user);
-                            UiUpdater.updateUi();
-                           });
-                        });
-                     
-                    // attrs.$observe('fileModel', function(fileModel){
-                    //     model = $parse(attrs.fileModel);
-                    //     modelSetter = model.assign;
-                    // });
-
-                    
-                    // element.bind('change', function(){
-                    //     scope.$apply(function(){
-                    //         var file = element[0].files[0];
-                    //         ReflectionUtils.createSettersGetters(file, '');
-                    //         modelSetter(scope.$parent, file);
-                            // ShadowAnnotations.doValidation(user);
-                            // UiUpdater.updateUi();
-                    //     });
-                    // });
-                }
-            };
-        }])
 
   .directive('saBind', function () {
     return {
@@ -212,7 +146,33 @@ angular.module('test1App')
     }
     $scope.data = data;
 
- 
+    var user = {
+
+        value1 : 9007199254740990,
+        value2 : 0.9999,
+        email: null,
+        total: 0,
+        totalNumber: 0,
+        name : 'Pablo',
+        geek: true,
+
+        address: {
+            street: null,
+            city: 'Humenné',
+            note: {
+                value: null,
+                number1: 9007199254740990,
+                number2: 0.9999,
+            },
+
+        },
+
+        items: [{name:'Item1', value:1},  {name:null, value:2},
+          {name:null, value:null, subitems: [{name:'subitem3', value:null},
+            {name:'subitem4', value:null, subsubitems:[{name:'subsubitem6', value:null},{name:'subsubitem7', value:null}]}]} ]
+
+
+     };
 
     var userShadow = {
 
@@ -251,11 +211,6 @@ angular.module('test1App')
             }
           }
 
-        },
-        sa$file: {beanValidation: {}},
-        file: { 
-            sa$name:{notEmptyValidation: {}},
-            sa$size: {notEmptyValidation: {}}
         }
      };
 
