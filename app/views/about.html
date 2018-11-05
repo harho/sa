@@ -39,7 +39,7 @@
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Number2</label>
                 <div class="col-sm-10">
-                    <input type="text" readonly sa-model sa-bind to-big ng-model="user.address.note.number2" class="form-control" id="name" name="name" placeholder="Enter Number2">
+                    <input type="text"  sa-model sa-bind to-big ng-model="user.address.note.number2" class="form-control" id="name" name="name" placeholder="Enter Number2">
                 </div>
             </div>
 
@@ -86,6 +86,32 @@
                 <label for="firstname" class="col-sm-2 control-label">Value2</label>
                 <div class="col-sm-10">
                     <input type="number" readonly sa-model sa-bind ng-model="user.value2" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="file" class="col-sm-2 control-label">File</label>
+                <div class="col-sm-10">
+                    <input type="file" sa-model sa-bind 
+                    class="form-control" 
+                    ng-model="user.file" 
+                    file-model="user.file"
+                    id="file" name="file" 
+                    placeholder="Upload File" >
+                    </div>
+            </div>  
+
+
+            <div class="form-group">
+                <label for="firstname" class="col-sm-2 control-label">file2</label>
+                <div class="col-sm-10">
+                    <input type="text"  sa-bind ng-model="user.file.name" class="form-control" id="value2" name="value2" placeholder="Enter Value2">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="firstname" class="col-sm-2 control-label">file3</label>
+                <div class="col-sm-10">
+                    <input type="text"   sa-bind ng-model="user.file.size" class="form-control" id="value3" name="value3" placeholder="Enter Value2">
                 </div>
             </div>
 

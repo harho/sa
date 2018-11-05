@@ -604,7 +604,11 @@ var ReflectionUtils = (function () {
 
           addSettersGetters(obj, rootObj, i, path);
         }
-
+        else if (obj instanceof File) {
+          if (i === 'name' || i === 'size') {
+              addSettersGetters(obj, rootObj, i, path);
+          }
+      }
       }
     }
   }
