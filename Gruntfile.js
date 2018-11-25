@@ -11,7 +11,6 @@ module.exports = function (grunt) {
 
   // Time how long tasks take. Can help when optimizing build times
   require('time-grunt')(grunt);
-
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
@@ -117,6 +116,7 @@ module.exports = function (grunt) {
         }
       }
     },
+
 
     // Make sure there are no obvious mistakes
     jshint: {
@@ -456,9 +456,49 @@ module.exports = function (grunt) {
         configFile: 'test/karma.conf.js',
         singleRun: true
       }
-    }
+    },
+    qunit: {
+      all: "test.html",
+      options: {
+        coverage: {
+          src: ['static/js/**/*.js'],
+          instrumentedFiles: 'temp/',
+          htmlReport: 'report/coverage',
+          coberturaReport: 'report/',
+          linesThresholdPct: 20
+        }
+        }
+  },
+  qunit_junit: {
+    options: {
+      dest: 'report/'
+  }
+  },
+
+    jenkins: {
+      serverAddress: 'http://localhost:8080'
+             // optional, default: '~/.netrc'
+    },
+    'grunt-jenkins-job': {
+      username: "root",
+      password: "root",
+      host: 'http://localhost:8080',
+      tasks: {
+          deployDev: {
+              jobName: 'build'
+          }
+      }
+  }
   });
 
+  // grunt.loadNpmTasks('deploy_site');
+  grunt.loadNpmTasks('grunt-jenkins');
+  grunt.loadNpmTasks( "grunt-contrib-qunit" );
+  grunt.loadNpmTasks('grunt-qunit-istanbul');
+  grunt.loadNpmTasks('grunt-qunit-junit');
+  grunt.loadNpmTasks('grunt-jenkins-job');
+
+  grunt.registerTask('deploydev', ['grunt-jenkins-job:deployDev']);
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
@@ -486,7 +526,8 @@ module.exports = function (grunt) {
     'concurrent:test',
     'postcss',
     'connect:test',
-    'karma'
+    'karma',
+    'coverage'
   ]);
 
   grunt.registerTask('build', [
@@ -513,4 +554,18 @@ module.exports = function (grunt) {
     'test',
     'build'
   ]);
+
+  grunt.registerTask('test-q', [
+    'qunit_cov'
+  ]);
+
+
+
+  grunt.registerTask('jenkins', [
+    'clean:dist',
+    'jshint']);
+
+    grunt.registerTask('qunit_junit', [
+      'qunit_junit']);
+
 };

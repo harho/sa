@@ -46,8 +46,10 @@ var ShadowAnnotations = (function () {
     updateUi : function () {
 
       //console.log('Updating UI errors and warnings count: '+(ValidationErrors.getErrors().length+ValidationWarnings.getWarnings().length));
+    
+      if (ShadowAnnotationsRegister.getUiUpdater() !==  null){
       ShadowAnnotationsRegister.getUiUpdater().updateUi();
-
+      }
       for(var i=0; i < ShadowAnnotationsRegister.getAdditionalUiUpdaters().length; i++) {
         ShadowAnnotationsRegister.getAdditionalUiUpdaters()[i].updateUi();
       }

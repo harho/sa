@@ -473,7 +473,9 @@ var AdditionalUiUpdater = (function () {
 
     }
     else {
+      if (document.getElementById('all-erros')){
       document.getElementById('all-errors').removeAttribute('data-content');
+      }
     }
   }
 
@@ -486,13 +488,16 @@ var AdditionalUiUpdater = (function () {
 
   function removeTooltipAttributes(elements) {
 
+    console.log("majo",elements.length)
+if (elements){
     for(var i=0; i<elements.length;i++) {
-
+      if (elements[i]){
       elements[i].className = 'form-group';
       elements[i].removeAttribute('data-content');
-
+      }
 
     }
+  }
   }
 
 

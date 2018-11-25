@@ -9,7 +9,7 @@ module.exports = function(config) {
     autoWatch: true,
 
     // base path, that will be used to resolve files and exclude
-    basePath: '../',
+    basePath: '..',
 
     // testing framework to use (jasmine/mocha/qunit/...)
     // as well as any additional frameworks (requirejs/chai/sinon/...)
@@ -42,6 +42,26 @@ module.exports = function(config) {
     exclude: [
     ],
 
+    coverageReporter: {
+      type: 'text-summary',
+      dir: 'coverage/'
+    },
+
+    preprocessors: {
+      // source files, that you wanna generate coverage for
+      // do not include tests or libraries
+      // (these files will be instrumented by Istanbul)
+      '**/js/page/**/*.js': ['coverage']
+  },
+  coverageReporter: {        
+    dir: '../../../grunt/js.coverage/',
+    reporters: [
+            { type: 'html', subdir: 'report-html' },                
+            { type: 'teamcity', subdir: '.', file: 'teamcity.txt' },
+    ]
+},
+
+    reporters: ['progress', 'coverage'],
     // web server port
     port: 8080,
 
@@ -60,7 +80,8 @@ module.exports = function(config) {
     // Which plugins to enable
     plugins: [
       'karma-phantomjs-launcher',
-      'karma-jasmine'
+      'karma-jasmine',
+      'karma-coverage'
     ],
 
     // Continuous Integration mode
