@@ -1,1 +1,1 @@
-grunt build --force
+/usr/local/bin/grunt build --force
